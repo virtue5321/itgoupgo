@@ -1,0 +1,253 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Noto Sans KR", sans-serif;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #f8f9fc;
+}
+
+/* -------------------- 1. 헤더 (로고 크기 조정 포함) -------------------- */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  height: 60px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 0 20px;
+}
+
+header .logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 18px;
+  color: #5a5ce8;
+}
+
+/* ⭐ 로고 이미지 크기 조정 핵심 수정 부분 ⭐ */
+header .logo img {
+  width: 150px; /* 로고 이미지의 너비를 80px -> 150px로 확대 */
+  height: auto; /* 이미지 비율 유지 */
+  vertical-align: middle;
+}
+
+/* -------------------- 2. 레이아웃 및 사이드바 -------------------- */
+.layout {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+/* 사이드바 */
+aside.sidebar {
+  width: 240px;
+  background: #fff;
+  border-right: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 20px;
+}
+
+.sidebar ul {
+  list-style: none;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar li {
+  width: 100%;
+  text-align: left;
+  position: relative; /* [추가] 서브메뉴 배치를 위한 설정 */
+}
+
+.sidebar a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 25px;
+  font-size: 15px;
+  color: #333;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+/* 마우스 오버 시 효과 */
+.sidebar a:hover {
+  background-color: #f3f4f6;
+  color: #5a5ce8;
+}
+
+/* 활성화된 항목 스타일 */
+.sidebar a.active {
+  background-color: #eaeaff;
+  color: #5a5ce8;
+  font-weight: 600;
+}
+
+
+
+/* -------------------- 3. 메인 콘텐츠 및 푸터 -------------------- */
+main {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+}
+
+main h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+/* 푸터 */
+footer {
+  height: 50px;
+  background-color: #ffffff;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+  font-size: 14px;
+}
+
+
+/* -------------------- 4. 테이블 및 버튼 스타일 추가 (관리 페이지용) -------------------- */
+
+/* 기본 테이블 스타일 */
+table {
+    width: 100%;
+    border-collapse: collapse; /* 셀 경계선 병합 */
+    background: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* 약간의 그림자 추가 */
+}
+
+/* 테이블 헤더 */
+table th {
+    background-color: #f4f6f9;
+    color: #555;
+    font-weight: 600;
+    padding: 12px 10px;
+    border: 1px solid #e0e0e0;
+    text-align: center;
+    font-size: 14px;
+}
+
+/* 테이블 바디 셀 */
+table td {
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    text-align: center;
+    font-size: 14px;
+    color: #444;
+}
+
+/* 홀수/짝수 행 배경색 구분 */
+table tbody tr:nth-child(even) {
+    background-color: #fcfdff;
+}
+table tbody tr:hover {
+    background-color: #f0f7ff;
+}
+
+/* 테이블 내 링크 스타일 */
+table td a {
+    color: #5a5ce8;
+    text-decoration: none;
+}
+table td a:hover {
+    text-decoration: underline;
+}
+
+/* 버튼 기본 스타일 (일괄 삭제, 관리 버튼 등) */
+.btn {
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    border: none;
+    transition: background-color 0.2s;
+}
+
+.btn-danger { /* 삭제 버튼 */
+    background-color: #dc3545;
+    color: white;
+}
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+/* 페이지네이션 스타일 */
+.pagination-container {
+    margin-top: 20px;
+    text-align: center;
+}
+.pagination-container a, .pagination-container span { /* span 추가 */
+    display: inline-block;
+    text-decoration: none;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin: 0 3px;
+    color: #5a5ce8;
+}
+.pagination-container .active { /* a.active -> .active */
+    background: #5a5ce8;
+    color: white;
+    border-color: #5a5ce8;
+    font-weight: 600;
+}
+.pagination-container a:hover:not(.active) {
+    background-color: #f3f4f6;
+}
+
+/* [추가] -------------------- 5. 드롭다운 서브메뉴 스타일 -------------------- */
+
+/* 서브 메뉴 (게시판 목록) 스타일 */
+.submenu {
+    list-style: none;
+    padding-left: 0; /* 서브 메뉴 자체는 들여쓰기 없음 */
+    margin: 0;
+    max-height: 0; /* 기본적으로 숨기기 */
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    background-color: #505050; /* 사이드바 배경색보다 약간 어둡게 */
+}
+
+/* 'menu-open' 클래스가 li에 있을 때 서브 메뉴를 열기 */
+.sidebar ul li.menu-open .submenu {
+    max-height: 500px; /* 충분히 큰 값 */
+    transition: max-height 0.5s ease-in; 
+}
+
+/* 서브 메뉴 링크 스타일 */
+.submenu a {
+    padding: 10px 25px 10px 35px; /* 메인 메뉴보다 살짝 들여쓰기 */
+    font-size: 14px;
+    color: #ddd; 
+    gap: 0; /* 아이콘이 없으므로 간격 제거 */
+}
+
+.submenu a:hover {
+    color: #fff;
+    background-color: #606060;
+}
+/* 현재 활성화된 서브 메뉴 링크 스타일 */
+.submenu a.sub-active {
+    color: #fff; /* 서브 메뉴는 흰색으로 강조 */
+    font-weight: 600;
+    background-color: #5a5ce8; /* 메인 활성화 색상 사용 */
+}

@@ -1,0 +1,5 @@
+package com.itgoupgo.community.info.model.vo;
+
+public class InfoBbs {
+
+}

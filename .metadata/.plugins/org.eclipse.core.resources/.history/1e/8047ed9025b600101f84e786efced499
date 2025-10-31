@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	
+	<settings>
+		<setting name="jdbcTypeForNull" value="NULL" />
+	</settings>
+	
+	<typeAliases>
+		<typeAlias type="com.itgoupgo.community.member.model.vo.Member" alias="member" />
+		<typeAlias type="com.itgoupgo.community.free.model.vo.FreeBbs" alias="free" />
+		<typeAlias type="com.itgoupgo.community.info.model.vo.InfoBbs" alias="info" />
+		<typeAlias type="com.itgoupgo.community.it.model.vo.ItBbs" alias="it" />
+		<typeAlias type="com.itgoupgo.community.knowledge.model.vo.KnowledgeBbs" alias="knowledge" />
+		<typeAlias type="com.itgoupgo.community.study.model.vo.StudyBbs" alias="study" />
+		<typeAlias type="com.itgoupgo.community.notice.model.vo.NoticeBbs" alias="notice" />
+				<typeAlias type="com.itgoupgo.community.free.model.vo.FreeAttachment" alias="freeAttachment"/>
+		<typeAlias type="com.itgoupgo.community.free.model.vo.FreeCategory" alias="freeCategory"/>
+		<typeAlias type="com.itgoupgo.community.free.model.vo.FreeReply" alias="freeReply"/>
+<typeAlias type="java.util.HashMap" alias="hashmap"/>
+	</typeAliases>
+	
+</configuration>

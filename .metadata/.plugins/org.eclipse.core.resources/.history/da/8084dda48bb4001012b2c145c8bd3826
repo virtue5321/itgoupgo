@@ -1,0 +1,5 @@
+package com.itgoupgo.community.common.model.vo;
+
+public class PageInfo {
+
+}

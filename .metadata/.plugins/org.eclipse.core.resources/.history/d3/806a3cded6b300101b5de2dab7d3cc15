@@ -1,0 +1,11 @@
+package com.itgoupgo.community.admin.model.dao;
+
+import org.mybatis.spring.SqlSessionTemplate;
+
+public class AdminDao {
+	
+	public int deleteMemberAdmin(SqlSessionTemplate sqlSession, String userId) {
+		
+		return sqlSession.update("adminMapper.deleteMemberAdmin", userId);
+	}
+}

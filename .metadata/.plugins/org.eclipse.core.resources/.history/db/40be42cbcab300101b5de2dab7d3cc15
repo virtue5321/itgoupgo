@@ -1,0 +1,50 @@
+/* ... (생략: Reset, body 스타일) ... */
+
+/* -------------------- 1. 헤더 -------------------- */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  height: 60px;
+  background-color: #ffffff;
+  /* 기존: border-bottom: 1px solid #e0e0e0; - 이 선은 이제 layout 아래에서 자연스럽게 이어지도록 합니다. */
+  padding: 0 20px;
+}
+/* ... (생략: header .logo 및 img 스타일) ... */
+
+
+/* -------------------- 2. 전체 레이아웃 -------------------- */
+.layout {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  /* ⭐ 핵심 수정: 헤더 하단 경계선 대신, 레이아웃 상단에 1px 선을 추가하여 사이드바와 연결성을 높입니다. */
+  border-top: 1px solid #e0e0e0; 
+}
+
+
+/* -------------------- 3. 사이드바 -------------------- */
+aside.sidebar {
+  width: 240px;
+  background: #fff;
+  border-right: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 20px;
+  /* ⭐ 핵심 수정: sidebar가 header 아래 선과 바로 맞닿도록 높이를 100%로 보장합니다. */
+  height: 100%; 
+  /* (이미 flex: 1; overflow: hidden; 내부에 있어 높이 100%가 보장되지만, 명시적으로 확인) */
+}
+
+/* ... (생략: sidebar ul, li, a 스타일) ... */
+
+/* -------------------- 4. 메인 -------------------- */
+main {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+  /* 메인 영역은 사이드바의 경계를 침범하지 않도록 합니다. */
+}
+
+/* ... (생략: footer, table 스타일) ... */

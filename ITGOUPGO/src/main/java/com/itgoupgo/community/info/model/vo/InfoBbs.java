@@ -1,0 +1,116 @@
+package com.itgoupgo.community.info.model.vo;
+
+import java.sql.Date;
+
+public class InfoBbs {
+
+	private int infoNo; // INFO_NO	NUMBER
+	private String infoTitle; // INFO_TITLE	VARCHAR2(100 BYTE)
+	private String infoContent; // INFO_CONTENT	VARCHAR2(4000 BYTE)
+	private Date infoCreateDate; // INFO_CREATE_DATE	DATE
+	private int infoView; // INFO_VIEW	NUMBER
+	private String infoCategory; // INFO_CATEGORY	VARCHAR2(40 BYTE)
+	private String infoDeleteStatus; // INFO_DELETE_STATUS	CHAR(1 BYTE)
+	private int memberNo; // MEMBER_NO	NUMBER
+	private String memberNick;
+	
+	public InfoBbs() {}
+
+	public InfoBbs(int infoNo, String infoTitle, String infoContent, Date infoCreateDate, int infoView,
+			String infoCategory, String infoDeleteStatus, int memberNo, String memberNick) {
+		super();
+		this.infoNo = infoNo;
+		this.infoTitle = infoTitle;
+		this.infoContent = infoContent;
+		this.infoCreateDate = infoCreateDate;
+		this.infoView = infoView;
+		this.infoCategory = infoCategory;
+		this.infoDeleteStatus = infoDeleteStatus;
+		this.memberNo = memberNo;
+		this.memberNick = memberNick;
+	}
+
+	public int getInfoNo() {
+		return infoNo;
+	}
+
+	public void setInfoNo(int infoNo) {
+		this.infoNo = infoNo;
+	}
+
+	public String getInfoTitle() {
+		return infoTitle;
+	}
+
+	public void setInfoTitle(String infoTitle) {
+		this.infoTitle = infoTitle;
+	}
+
+	public String getInfoContent() {
+		return infoContent;
+	}
+
+	public void setInfoContent(String infoContent) {
+		this.infoContent = infoContent;
+	}
+
+	public Date getInfoCreateDate() {
+		return infoCreateDate;
+	}
+
+	public void setInfoCreateDate(Date infoCreateDate) {
+		this.infoCreateDate = infoCreateDate;
+	}
+
+	public int getInfoView() {
+		return infoView;
+	}
+
+	public void setInfoView(int infoView) {
+		this.infoView = infoView;
+	}
+
+	public String getInfoCategory() {
+		return infoCategory;
+	}
+
+	public void setInfoCategory(String infoCategory) {
+		this.infoCategory = infoCategory;
+	}
+
+	public String getInfoDeleteStatus() {
+		return infoDeleteStatus;
+	}
+
+	public void setInfoDeleteStatus(String infoDeleteStatus) {
+		this.infoDeleteStatus = infoDeleteStatus;
+	}
+
+	public int getMemberNo() {
+		return memberNo;
+	}
+
+	public void setMemberNo(int memberNo) {
+		this.memberNo = memberNo;
+	}
+	
+	
+
+	public String getMemberNick() {
+		return memberNick;
+	}
+
+	public void setMemberNick(String memberNick) {
+		this.memberNick = memberNick;
+	}
+
+	@Override
+	public String toString() {
+		return "InfoBbs [infoNo=" + infoNo + ", infoTitle=" + infoTitle + ", infoContent=" + infoContent
+				+ ", infoCreateDate=" + infoCreateDate + ", infoView=" + infoView + ", infoCategory=" + infoCategory
+				+ ", infoDeleteStatus=" + infoDeleteStatus + ", memberNo=" + memberNo + "]";
+	}
+	
+	
+	
+}

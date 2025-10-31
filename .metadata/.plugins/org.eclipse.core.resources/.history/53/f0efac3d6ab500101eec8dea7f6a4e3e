@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="adminMapper">
+	
+	<resultMap id="memberResultSet" type="member">
+		<id column="MEMBER_NO" property="memberNo" />
+		<result column="MEMBER_ID" property="memberId" />
+		<result column="MEMBER_PWD" property="memberPwd" />
+		<result column="MEMBER_NAME" property="memberName" />
+		<result column="MEMBER_NICK" property="memberNick" />
+		<result column="MEMBER_BIRTH_DATE" property="memberBirthDate" />
+		<result column="GENDER" property="gender" />
+		<result column="EMAIL" property="email" />
+		<result column="PHONE" property="phone" />
+		<result column="ENROLL_DATE" property="enrollDate" />
+		<result column="MEMBER_STATUS" property="memberStatus" />
+	</resultMap>
+	
+	<resultMap id="freeResultSet" type="free">
+		<id column="FREE_NO" property="freeNo" />
+		<result column="FREE_TITLE" property="freeTitle" />
+		<result column="FREE_CONTENT" property="freeContent" />
+		<result column="FREE_CREATE_DATE" property="freeCreateDate" />
+		<result column="FREE_VIEW" property="freeView" />
+		<result column="FREE_DELETE_STATUS" property="freeDeleteStatus" />
+		<result column="MEMBER_NO" property="memberNo" />
+        <result column="FREE_WRITER_ID" property="freeWriterId" /> </resultMap>
+	
+	<select id="selectMemberList" resultMap="memberResultSet">
+		SELECT
+			MEMBER_NO,
+			MEMBER_ID,
+			MEMBER_NAME,
+			GENDER,
+			PHONE,
+			EMAIL,
+			ENROLL_DATE,
+			MEMBER_STATUS
+		FROM MEMBER
+		ORDER BY ENROLL_DATE DESC
+	</select>
+	
+	<update id="deleteMemberAdmin" parameterType="string">
+		UPDATE MEMBER
+		   SET MEMBER_STATUS = 'N'
+		 WHERE MEMBER_ID = #{memberId}
+		   AND MEMBER_STATUS = 'Y'
+	</update>
+	
+	<update id="deleteCheckMember" parameterType="java.util.List">
+        UPDATE MEMBER
+           SET MEMBER_STATUS = 'N'
+         WHERE MEMBER_NO IN
+        <foreach collection="list" item="memberNo" open="(" separator="," close=")">
+            #{memberNo}
+        </foreach>
+           AND MEMBER_STATUS = 'Y'
+    </update>
+	
+	<select id="searchMemberByName" resultMap="memberResultSet">
+		SELECT
+			MEMBER_NO,
+			MEMBER_ID,
+			MEMBER_NAME,
+			GENDER,
+			PHONE,
+			EMAIL,
+			ENROLL_DATE,
+			MEMBER_STATUS
+		  FROM MEMBER
+		 WHERE MEMBER_NAME LIKE '%' || #{memberName} || '%' 
+	</select>
+	
+	<select id="searchMemberById" resultMap="memberResultSet">
+		SELECT
+			MEMBER_NO,
+			MEMBER_ID,
+			MEMBER_NAME,
+			GENDER,
+			PHONE,
+			EMAIL,
+			ENROLL_DATE,
+			MEMBER_STATUS
+		  FROM MEMBER
+		 WHERE MEMBER_ID = #{memberId}
+	</select>
+	
+	<select id="selectMemberDetail" resultMap="memberResultSet" parameterType="_int">
+	    SELECT
+	        *
+	    FROM MEMBER
+	    WHERE MEMBER_NO = #{memberNo}
+	</select>
+	
+	<select id="selectListCount" resultType="_int">
+        SELECT COUNT(*) FROM MEMBER
+    </select>
+    
+    <select id="selectFreeListCount" resultType="_int">
+        SELECT COUNT(*) FROM FREE_BBS 
+    </select>
+
+    <select id="selectFreeList" resultMap="freeResultSet">
+    	SELECT 
+            T1.FREE_NO,
+            T1.FREE_TITLE,
+            T1.FREE_CREATE_DATE,
+            T1.FREE_VIEW,
+            T1.MEMBER_NO  
+            FROM FREE_BBS T1          
+      ORDER BY T1.FREE_NO DESC
+    </select>
+    
+    <update id="deleteFreeBbs" parameterType="_int">
+    	UPDATE FREE_BBS
+    	   SET FREE_DELETE_STATUS = 'Y'
+    	 WHERE FREE_NO = #{bbsNo}
+    	   AND FREE_DELETE_STATUS = 'N'
+    </update>
+
+    <update id="deleteFreeBbsCheck" parameterType="list">
+    	UPDATE FREE_BBS
+    	   SET FREE_DELETE_STATUS = 'Y'
+    	 WHERE FREE_NO IN
+    	 <foreach collection="list" item="bbsNo" open="(" separator="," close=")">
+    	 	#{bbsNo}
+    	 </foreach>
+    	   AND FREE_DELETE_STATUS = 'N'
+    </update>
+    
+</mapper>

@@ -1,0 +1,98 @@
+package com.itgoupgo.community.notice.model.service;
+
+import java.util.List;
+
+import org.apache.ibatis.session.RowBounds;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.itgoupgo.community.notice.model.dao.NoticeDao;
+import com.itgoupgo.community.notice.model.vo.NoticeBbs; // NoticeBbs VO 사용
+
+/**
+ * 공지사항 Service Layer
+ * 비즈니스 로직을 처리하고 트랜잭션을 관리합니다.
+ */
+@Service
+public class NoticeService {
+	
+	@Autowired
+	private SqlSessionTemplate sqlSession; // MyBatis 쿼리 실행을 위한 SqlSessionTemplate
+	
+	@Autowired
+	private NoticeDao noticeDao; // 데이터베이스 접근을 위한 DAO 주입
+
+    // 게시글 목록 페이징 처리를 위한 상수 설정
+    private static final int BOARD_LIMIT = 10; 
+	
+	/**
+	 * 전체 게시글 개수 조회
+	 * @return 전체 게시글 수
+	 */
+	public int selectListCount() {
+		return noticeDao.selectListCount(sqlSession);
+	}
+	
+	/**
+	 * 게시글 목록 조회 (페이징 적용)
+	 * @param currentPage 현재 페이지 번호
+	 * @return 현재 페이지에 해당하는 게시글 목록
+	 */
+	public List<NoticeBbs> selectList(int currentPage) {
+        // 페이징 처리를 위한 offset 계산
+        int offset = (currentPage - 1) * BOARD_LIMIT;
+        
+        // RowBounds 객체 생성 (offset: 건너뛸 행 수, limit: 가져올 행 수)
+        RowBounds rowBounds = new RowBounds(offset, BOARD_LIMIT);
+        
+		return noticeDao.selectList(sqlSession, rowBounds);
+	}
+
+    /**
+     * 게시글 상세 조회 및 조회수 증가 처리 (트랜잭션 적용)
+     * @param noticeNo 조회할 게시글 번호
+     * @return 조회된 NoticeBbs 객체
+     */
+    @Transactional
+    public NoticeBbs selectNoticeBbs(int noticeNo) {
+        
+        // 1. 조회수 증가 (공지사항은 조회수 증가 로직이 없을 수 있지만, 일단 일반 게시판과 동일하게 구현)
+        int result = noticeDao.increaseNoticeBbsCount(sqlSession, noticeNo);
+        
+        NoticeBbs notice = null;
+        
+        // 2. 조회수 증가 성공 시 게시글 조회
+        if(result > 0) {
+        	notice = noticeDao.selectNoticeBbs(sqlSession, noticeNo);
+        }
+        
+        return notice; // 게시글 조회 실패 시 null 반환
+    }
+
+    /**
+     * 새로운 게시글 등록 (트랜잭션 적용)
+     * @param f 등록할 NoticeBbs 객체
+     * @return 처리된 행의 수
+     */
+    @Transactional
+    public int insertNoticeBbs(NoticeBbs notice) {
+        return noticeDao.insertNoticeBbs(sqlSession, notice);
+    }
+    
+    /**
+     * 게시글 삭제 (삭제 상태 업데이트) (트랜잭션 적용)
+     * @param noticeNo 삭제할 게시글 번호
+     * @return 처리된 행의 수
+     */
+    @Transactional
+    public int deleteNoticeBbs(int noticeNo) {
+        return noticeDao.deleteNoticeBbs(sqlSession, noticeNo);
+    }
+    
+    @Transactional
+    public int deleteNoticeBbsCheck(List<Integer> bbsNoList) {
+        return noticeDao.deleteNoticeBbsCheck(sqlSession, bbsNoList);
+    }
+}

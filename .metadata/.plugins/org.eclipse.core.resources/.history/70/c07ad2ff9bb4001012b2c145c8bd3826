@@ -1,0 +1,72 @@
+package com.itgoupgo.community.admin.model.service;
+
+import java.util.List;
+import java.util.Map; // Map import는 필요하지 않으므로 제거함
+
+import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.itgoupgo.community.admin.model.dao.AdminDao;
+import com.itgoupgo.community.common.model.vo.PageInfo;
+import com.itgoupgo.community.member.model.vo.Member;
+
+@Service
+public class AdminService {
+
+	@Autowired
+	private SqlSessionTemplate sqlSession;
+	
+	@Autowired
+	private AdminDao adminDao; 
+	
+    // 💡 [유지] 1. 전체 회원 수 조회 (페이징용)
+	public int selectListCount() {
+        return adminDao.selectListCount(sqlSession);
+    }
+	
+    // 💡 [유지] 2. 페이징 정보(PageInfo)를 받아 목록 조회
+	public List<Member> selectMemberList(PageInfo pi) {
+		return adminDao.selectMemberList(sqlSession, pi);
+	}
+	
+    // 🚩 [추가] 3. 이름 검색 결과 총 개수 조회
+    public int selectSearchNameCount(String userName) {
+        return adminDao.selectSearchNameCount(sqlSession, userName);
+    }
+
+    // 🚩 [추가] 4. 아이디 검색 결과 총 개수 조회
+    public int selectSearchIdCount(String memberId) {
+        return adminDao.selectSearchIdCount(sqlSession, memberId);
+    }
+
+    // 🚩 [수정] 5. 회원 이름으로 검색 (메소드 유지, PageInfo 추가)
+	@Transactional
+	public List<Member> searchMemberByName(String userName, PageInfo pi) { 
+		return adminDao.searchMemberByName(sqlSession, userName, pi);
+	}
+	
+    // 🚩 [수정] 6. 회원 아이디로 검색 (메소드 유지, List<Member> 반환 및 PageInfo 추가)
+	@Transactional
+	public List<Member> searchMemberById(String memberId, PageInfo pi) { 
+		return adminDao.searchMemberById(sqlSession, memberId, pi);
+	}
+	
+    // 💡 [유지] 7. 단일 회원 탈퇴 요청에 대한 트랜잭션 처리
+	@Transactional
+	public int deleteMemberAdmin(String memberId) {
+		return adminDao.deleteMemberAdmin(sqlSession, memberId);
+	}
+	
+    // 💡 [유지] 8. 일괄 회원 탈퇴 트랜잭션 처리
+    @Transactional
+    public int deleteCheckMember(List<Integer> memberNoList) {
+        return adminDao.deleteCheckMember(sqlSession, memberNoList);
+    }
+    
+    // 💡 [유지] 9. 회원 상세조회
+	public Member selectMemberDetail(int memberNo) {
+        return adminDao.selectMemberDetail(sqlSession, memberNo);
+    }
+}

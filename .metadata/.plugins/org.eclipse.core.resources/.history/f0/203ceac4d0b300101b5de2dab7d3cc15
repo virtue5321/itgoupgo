@@ -1,0 +1,9 @@
+package com.itgoupgo.community.admin.model.dao;
+
+public class AdminDao {
+	
+	public int deleteMemberAdmin(SqlSessionTemplate sqlSession, String userId) {
+		
+		return sqlSession.update("adminMapper.deleteMemberAdmin", userId);
+	}
+}

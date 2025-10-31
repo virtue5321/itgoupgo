@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>회원 관리</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="resources/image/logo.png" width="80">
+      관리자 페이지
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <ul>
+        <li><a href="index.html">🏠 대시보드</a></li>
+        <li><a href="memberManage.html" class="active">👥 회원 관리</a></li>
+        <li><a href="postManage.html">📝 게시글 관리</a></li>
+        <li><a href="commentManage.html">💬 댓글 관리</a></li>
+        <li><a href="stats.html">📊 통계</a></li>
+        <li><a href="logout.html">🚪 로그아웃</a></li>
+      </ul>
+    </aside>
+
+    <main>
+      <h1>👥 회원 관리</h1>
+      <p>등록된 회원 목록을 확인하고 관리할 수 있습니다.</p>
+
+      <form style="margin-bottom: 20px; display:flex; gap:10px; align-items:center; background:#fff; padding:15px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
+        <select style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+          <option value="name">이름</option>
+          <option value="email">아이디</option>
+        </select>
+        <input type="text" placeholder="검색어를 입력하세요" style="flex-grow: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        <button type="submit" style="background:#5a5ce8; color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer;">검색</button>
+      </form>
+      <div style="display:flex; justify-content:flex-end; align-items:center; margin-bottom:10px;">
+        <button style="background:#dc3545; color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer;">
+          선택 항목 일괄 탈퇴
+        </button>
+      </div>
+
+      <table border="1" cellpadding="10" cellspacing="0" style="width:100%; background:white; border-collapse:collapse; text-align:center;">
+        <tr style="background:#f3f4f6;">
+          <th><input type="checkbox" id="selectAllCheckboxMember"></th> 
+          <th>회원번호</th><th>이름</th><th>이메일</th><th>가입일</th><th>관리</th>
+        </tr>
+        <tr><td><input type="checkbox" class="itemCheckboxMember"></td><td>1</td><td>홍길동</td><td>hong@example.com</td><td>2025-01-05</td><td><button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">탈퇴</button></td></tr>
+        <tr><td><input type="checkbox" class="itemCheckboxMember"></td><td>2</td><td>김철수</td><td>kim@example.com</td><td>2025-02-20</td><td><button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">탈퇴</button></td></tr>
+        <tr><td><input type="checkbox" class="itemCheckboxMember"></td><td>3</td><td>관리자A</td><td>admin@example.com</td><td>2024-12-01</td><td><button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">탈퇴</button></td></tr>
+        <tr><td><input type="checkbox" class="itemCheckboxMember"></td><td>4</td><td>user004</td><td>user004@example.com</td><td>2025-03-10</td><td><button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">탈퇴</button></td></tr>
+        <tr><td><input type="checkbox" class="itemCheckboxMember"></td><td>5</td><td>user005</td><td>user005@example.com</td><td>2025-03-15</td><td><button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">탈퇴</button></td></tr>
+        <tr><td><input type="checkbox" class="itemCheckboxMember"></td><td>6</td><td>user006</td><td>user006@example.com</td><td>2025-03-18</td><td><button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">탈퇴</button></td></tr>
+        <tr><td><input type="checkbox" class="itemCheckboxMember"></td><td>7</td><td>user007</td><td>user007@example.com</td><td>2025-03-21</td><td><button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">탈퇴</button></td></tr>
+        <tr><td><input type="checkbox" class="itemCheckboxMember"></td><td>8</td><td>user008</td><td>user008@example.com</td><td>2025-03-24</td><td><button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">탈퇴</button></td></tr>
+        <tr><td><input type="checkbox" class="itemCheckboxMember"></td><td>9</td><td>user009</td><td>user009@example.com</td><td>2025-03-27</td><td><button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">탈퇴</button></td></tr>
+        <tr><td><input type="checkbox" class="itemCheckboxMember"></td><td>10</td><td>user010</td><td>user010@example.com</td><td>2025-03-30</td><td><button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">탈퇴</button></td></tr>
+        <tr><td><input type="checkbox" class="itemCheckboxMember"></td><td>11</td><td>user011</td><td>user011@example.com</td><td>2025-04-01</td><td><button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">탈퇴</button></td></tr>
+        <tr><td><input type="checkbox" class="itemCheckboxMember"></td><td>12</td><td>user012</td><td>user012@example.com</td><td>2025-04-03</td><td><button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">탈퇴</button></td></tr>
+        <tr><td><input type="checkbox" class="itemCheckboxMember"></td><td>13</td><td>user013</td><td>user013@example.com</td><td>2025-04-05</td><td><button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">탈퇴</button></td></tr>
+        <tr><td><input type="checkbox" class="itemCheckboxMember"></td><td>14</td><td>user014</td><td>user014@example.com</td><td>2025-04-07</td><td><button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">탈퇴</button></td></tr>
+        <tr><td><input type="checkbox" class="itemCheckboxMember"></td><td>15</td><td>user015</td><td>user015@example.com</td><td>2025-04-09</td><td><button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">탈퇴</button></td></tr>
+        <tr><td><input type="checkbox" class="itemCheckboxMember"></td><td>16</td><td>user016</td><td>user016@example.com</td><td>2025-04-11</td><td><button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">탈퇴</button></td></tr>
+        <tr><td><input type="checkbox" class="itemCheckboxMember"></td><td>17</td><td>user017</td><td>user017@example.com</td><td>2025-04-13</td><td><button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">탈퇴</button></td></tr>
+        <tr><td><input type="checkbox" class="itemCheckboxMember"></td><td>18</td><td>user018</td><td>user018@example.com</td><td>2025-04-15</td><td><button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">탈퇴</button></td></tr>
+        <tr><td><input type="checkbox" class="itemCheckboxMember"></td><td>19</td><td>user019</td><td>user019@example.com</td><td>2025-04-17</td><td><button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">탈퇴</button></td></tr>
+        <tr><td><input type="checkbox" class="itemCheckboxMember"></td><td>20</td><td>user020</td><td>user020@example.com</td><td>2025-04-19</td><td><button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">탈퇴</button></td></tr>
+        </table>
+
+      <div style="text-align:center; margin-top:20px;">
+        <a href="#" style="text-decoration:none; padding:5px 10px; border:1px solid #ccc; border-radius:3px; margin:0 2px;">&lt;</a>
+        <a href="#" style="text-decoration:none; padding:5px 10px; border:1px solid #ccc; border-radius:3px; background:#5a5ce8; color:white; margin:0 2px;">1</a>
+        <a href="#" style="text-decoration:none; padding:5px 10px; border:1px solid #ccc; border-radius:3px; margin:0 2px;">2</a>
+        <a href="#" style="text-decoration:none; padding:5px 10px; border:1px solid #ccc; border-radius:3px; margin:0 2px;">3</a>
+        <a href="#" style="text-decoration:none; padding:5px 10px; border:1px solid #ccc; border-radius:3px; margin:0 2px;">4</a>
+        <a href="#" style="text-decoration:none; padding:5px 10px; border:1px solid #ccc; border-radius:3px; margin:0 2px;">5</a>
+        <a href="#" style="text-decoration:none; padding:5px 10px; border:1px solid #ccc; border-radius:3px; margin:0 2px;">&gt;</a>
+      </div>
+    </main>
+  </div>
+
+  <footer>ⓒ 2025 IT GO UP GO. All Rights Reserved.</footer>
+
+<script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const selectAllCheckbox = document.getElementById('selectAllCheckboxMember');
+        const itemCheckboxes = document.querySelectorAll('.itemCheckboxMember');
+        selectAllCheckbox.addEventListener('change', function() {
+            itemCheckboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+        });
+        itemCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const allChecked = Array.from(itemCheckboxes).every(cb => cb.checked);
+                selectAllCheckbox.checked = allChecked;
+            });
+        });
+    });
+</script>
+</body>
+</html>

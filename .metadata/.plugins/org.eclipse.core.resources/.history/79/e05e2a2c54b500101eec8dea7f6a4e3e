@@ -1,0 +1,211 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>게시글 관리</title>
+  <link rel="stylesheet" href="<c:url value="/resources/css/adminStyle.css" />">
+  <style>
+    /* 활성 메뉴 스타일 */
+    .sidebar li.has-submenu > a { font-weight: bold; }
+    .sidebar ul.submenu { list-style: none; padding-left: 15px; margin-top: 5px; }
+    /* 서브 메뉴 스타일: 짙은 회색으로 시작하여, hover/active 시 보라색으로 강조 */
+    .sidebar ul.submenu li a { display: block; padding: 5px 0 5px 15px; color: #555; font-size: 0.9em; border-left: 2px solid transparent; transition: all 0.2s; }
+    .sidebar ul.submenu li a.sub-active { color: #5a5ce8; font-weight: 600; border-left: 2px solid #5a5ce8; }
+    .sidebar ul.submenu li a:hover { color: #5a5ce8; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="<c:url value="/resources/images/logo.png" />" width="80">
+      관리자 페이지
+    </div>
+  </header>
+
+  <%-- 💡 JSTL: 현재 보고 있는 게시판의 타입과 제목을 설정 (URL의 param.board를 사용) --%>
+  <c:set var="currentBoard" value="${param.board}" />
+  <c:set var="boardTitle" value="전체 게시글" />
+  <c:choose>
+    <c:when test="${currentBoard eq 'notice'}"><c:set var="boardTitle" value="공지사항 관리" /></c:when>
+    <c:when test="${currentBoard eq 'info'}"><c:set var="boardTitle" value="정보 나눔 관리" /></c:when>
+    <c:when test="${currentBoard eq 'free'}"><c:set var="boardTitle" value="자유 게시판 관리" /></c:when>
+    <%-- board 파라미터가 없거나 올바르지 않으면 'notice'를 기본값으로 설정 --%>
+    <c:otherwise><c:set var="currentBoard" value="notice" /><c:set var="boardTitle" value="공지사항 관리" /></c:otherwise>
+  </c:choose>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <ul>
+        <li><a href="<c:url value="/admin/dashboard" />">🏠 대시보드</a></li>
+        <li><a href="<c:url value="/admin/member" />">👥 회원 관리</a></li>
+        <%-- 📝 게시글 관리를 상위 메뉴로, 각 게시판을 하위 메뉴로 변경 --%>
+        <li class="has-submenu">
+          <a href="<c:url value="/admin/post?board=notice" />" class="active">📝 게시글 관리</a>
+          <ul class="submenu">
+            <li><a href="<c:url value="/admin/post?board=notice" />" class="<c:if test="${currentBoard eq 'notice'}">sub-active</c:if>">공지사항</a></li>
+            <li><a href="<c:url value="/admin/post?board=info" />" class="<c:if test="${currentBoard eq 'info'}">sub-active</c:if>">정보 나눔</a></li>
+            <li><a href="<c:url value="/admin/post?board=free" />" class="<c:if test="${currentBoard eq 'free'}">sub-active</c:if>">자유 게시판</a></li>
+            <%-- 추후 IT 뉴스, 지식 공유, 스터디 모집 등 다른 게시판 추가 시 여기에 추가 --%>
+          </ul>
+        </li>
+        <li><a href="<c:url value="/admin/reply" />">💬 댓글 관리</a></li>
+        <li><a href="<c:url value="/admin/stats" />">📊 통계</a></li>
+        <li><a href="<c:url value="/admin/logout" />">🚪 로그아웃</a></li>
+      </ul>
+    </aside>
+
+    <main>
+      <%-- 현재 보고 있는 게시판 제목 표시 --%>
+      <h1>📝 ${boardTitle}</h1>
+      <p>현재 **${boardTitle}**에 등록된 게시글을 확인하고 관리할 수 있습니다.</p>
+
+      <form action="<c:url value="/admin/searchPost" />" method="get" style="margin-bottom: 20px; display:flex; gap:10px; align-items:center; background:#fff; padding:15px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
+        <%-- 💡 중요: 검색 시 현재 게시판 타입을 유지하기 위해 hidden input 추가 --%>
+        <input type="hidden" name="board" value="${currentBoard}">
+
+        <%-- '정보 나눔' 게시판에만 카테고리/유형 드롭다운 표시 (가정) --%>
+        <c:if test="${currentBoard eq 'info'}">
+            <select name="category" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+              <option value="all">-- 전체 카테고리 --</option>
+              <option value="tip">팁/노하우</option>
+              <option value="review">리뷰</option>
+              <option value="etc">기타</option>
+            </select>
+        </c:if>
+
+        <select name="searchKey" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+          <option value="title">제목</option>
+          <%-- 공지사항(관리자) 외에는 작성자 검색 가능 --%>
+          <c:if test="${currentBoard ne 'notice'}">
+            <option value="writer">작성자</option>
+          </c:if>
+        </select>
+        <input type="text" name="keyword" placeholder="검색어를 입력하세요" style="flex-grow: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        <button type="submit" style="background:#5a5ce8; color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer;">검색</button>
+      </form>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <%-- 공지사항 관리 페이지에만 글쓰기 버튼 추가 (관리자용) --%>
+        <c:if test="${currentBoard eq 'notice'}">
+          <button style="background:#28a745; color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer;" onclick="location.href='<c:url value="/admin/post/writeNotice" />';">
+            새 공지 작성
+          </button>
+        </c:if>
+        <div style="flex-grow: 1;"></div> <%-- 왼쪽 버튼과 오른쪽 버튼 사이에 공간 확보 --%>
+        <button style="background:#dc3545; color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer;">
+          선택 항목 일괄 삭제
+        </button>
+      </div>
+
+
+      <table border="1" cellpadding="10" cellspacing="0" style="width:100%; background:white; border-collapse:collapse; text-align:center;">
+        <tr style="background:#f3f4f6;">
+          <th style="width: 30px;"><input type="checkbox" id="selectAllCheckbox"></th>
+          <th style="width: 50px;">번호</th>
+          <%-- 정보 나눔 게시판에는 카테고리 열 추가 --%>
+          <c:if test="${currentBoard eq 'info'}">
+            <th style="width: 100px;">카테고리</th>
+          </c:if>
+          <th>제목</th>
+          <%-- 공지사항 외 게시판에만 작성자 열 표시 --%>
+          <c:if test="${currentBoard ne 'notice'}">
+            <th style="width: 120px;">작성자</th>
+          </c:if>
+          <th style="width: 120px;">작성일</th>
+          <th style="width: 60px;">조회수</th>
+          <th style="width: 80px;">관리</th>
+        </tr>
+
+        <%-- 💡 게시글 목록 출력 부분 (Mock Data) --%>
+        <c:choose>
+          <c:when test="${currentBoard eq 'notice'}">
+            <%-- 공지사항 Mock Data --%>
+            <tr><td><input type="checkbox" class="itemCheckbox"></td><td>1</td><td style="text-align:left;">[필독] 서비스 개편 안내</td><td>2025-04-10</td><td>300</td><td><button style="background:#ffc107; color:#333; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">수정</button> <button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">삭제</button></td></tr>
+            <tr><td><input type="checkbox" class="itemCheckbox"></td><td>2</td><td style="text-align:left;">신규 기능 업데이트 공지</td><td>2025-03-25</td><td>150</td><td><button style="background:#ffc107; color:#333; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">수정</button> <button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">삭제</button></td></tr>
+            <tr><td><input type="checkbox" class="itemCheckbox"></td><td>3</td><td style="text-align:left;">2월 서버 점검 일정</td><td>2025-02-14</td><td>80</td><td><button style="background:#ffc107; color:#333; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">수정</button> <button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">삭제</button></td></tr>
+            <%-- <c:forEach var="post" items="${noticeList}"> ... </c:forEach> 형태로 실제 데이터 출력 예정 --%>
+          </c:when>
+          <c:when test="${currentBoard eq 'info'}">
+            <%-- 정보 나눔 Mock Data --%>
+            <tr><td><input type="checkbox" class="itemCheckbox"></td><td>1</td><td>팁/노하우</td><td style="text-align:left;">Spring Boot 3 환경 설정 팁</td><td>dev_master</td><td>2025-04-05</td><td>250</td><td><button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">삭제</button></td></tr>
+            <tr><td><input type="checkbox" class="itemCheckbox"></td><td>2</td><td>리뷰</td><td style="text-align:left;">최신 AI 모델 사용 후기</td><td>AI_lover</td><td>2025-03-30</td><td>180</td><td><button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">삭제</button></td></tr>
+            <tr><td><input type="checkbox" class="itemCheckbox"></td><td>3</td><td>기타</td><td style="text-align:left;">개발자 컨퍼런스 후기</td><td>traveler</td><td>2025-03-15</td><td>120</td><td><button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">삭제</button></td></tr>
+            <%-- <c:forEach var="post" items="${infoList}"> ... </c:forEach> 형태로 실제 데이터 출력 예정 --%>
+          </c:when>
+          <c:when test="${currentBoard eq 'free'}">
+            <%-- 자유 게시판 Mock Data --%>
+            <tr><td><input type="checkbox" class="itemCheckbox"></td><td>1</td><td style="text-align:left;">오늘 점심은 뭐 먹을까요? (고민)</td><td>user123</td><td>2025-04-08</td><td>90</td><td><button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">삭제</button></td></tr>
+            <tr><td><input type="checkbox" class="itemCheckbox"></td><td>2</td><td style="text-align:left;">주말에 가볼 만한 곳 추천 받아요!</td><td>explorer</td><td>2025-03-22</td><td>110</td><td><button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">삭제</button></td></tr>
+            <tr><td><input type="checkbox" class="itemCheckbox"></td><td>3</td><td style="text-align:left;">혹시 이런 에러 겪어보신 분 계신가요?</td><td>bug_hunter</td><td>2025-03-10</td><td>150</td><td><button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">삭제</button></td></tr>
+            <%-- <c:forEach var="post" items="${freeList}"> ... </c:forEach> 형태로 실제 데이터 출력 예정 --%>
+          </c:when>
+          <c:otherwise>
+            <tr><td colspan="7" style="padding: 50px; color: #777;">게시판 정보가 올바르지 않거나 게시글이 없습니다.</td></tr>
+          </c:otherwise>
+        </c:choose>
+      </table>
+
+      <div style="margin-top:20px; text-align:center;">
+        <a href="#" style="text-decoration:none; padding:5px 10px; border:1px solid #ccc; border-radius:3px; margin:0 2px;">&lt;</a>
+        <a href="#" style="text-decoration:none; padding:5px 10px; border:1px solid #ccc; border-radius:3px; margin:0 2px; background:#5a5ce8; color:white;">1</a>
+        <a href="#" style="text-decoration:none; padding:5px 10px; border:1px solid #ccc; border-radius:3px; margin:0 2px;">2</a>
+        <a href="#" style="text-decoration:none; padding:5px 10px; border:1px solid #ccc; border-radius:3px; margin:0 2px;">3</a>
+        <a href="#" style="text-decoration:none; padding:5px 10px; border:1px solid #ccc; border-radius:3px; margin:0 2px;">4</a>
+        <a href="#" style="text-decoration:none; padding:5px 10px; border:1px solid #ccc; border-radius:3px; margin:0 2px;">5</a>
+        <a href="#" style="text-decoration:none; padding:5px 10px; border:1px solid #ccc; border-radius:3px; margin:0 2px;">&gt;</a>
+      </div>
+    </main>
+  </div>
+
+  <footer>ⓒ 2025 IT GO UP GO. All Rights Reserved.</footer>
+
+<script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+        const itemCheckboxes = document.querySelectorAll('.itemCheckbox');
+
+        // 💡 체크박스 전체 선택/해제 기능
+        selectAllCheckbox.addEventListener('change', function() {
+            itemCheckboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+        });	
+
+        itemCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                const checkedItems = document.querySelectorAll('.itemCheckbox:checked').length;
+                if (!checkbox.checked) {
+                    selectAllCheckbox.checked = false;
+                } else if (checkedItems === itemCheckboxes.length) {
+                    selectAllCheckbox.checked = true;
+                }
+            });
+        });
+        
+        // 💡 [추가] 사이드바 서브메뉴 활성화 처리 (새로고침 시 활성 유지)
+        const currentBoard = '${currentBoard}';
+        const subLinks = document.querySelectorAll('.submenu a');
+        
+        // 서브메뉴 활성화
+        subLinks.forEach(link => {
+            const url = new URL(link.href);
+            const boardParam = url.searchParams.get('board');
+            if (boardParam === currentBoard) {
+                link.classList.add('sub-active');
+            } else {
+                 link.classList.remove('sub-active');
+            }
+        });
+        
+        // 💡 [추가] 메인 '게시글 관리' 메뉴도 활성화 상태 유지
+        const mainPostLink = document.querySelector('.sidebar a[href*="/admin/post"]');
+        if (mainPostLink && (currentBoard === 'notice' || currentBoard === 'info' || currentBoard === 'free')) {
+             mainPostLink.classList.add('active');
+        }
+    });
+</script>
+</body>
+</html>

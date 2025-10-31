@@ -1,0 +1,5 @@
+package com.itgoupgo.community.info.model.service;
+
+public class InfoService {
+
+}

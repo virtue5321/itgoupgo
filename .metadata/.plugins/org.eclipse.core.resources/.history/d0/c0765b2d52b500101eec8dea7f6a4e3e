@@ -1,0 +1,5 @@
+package com.itgoupgo.community.study.model.service;
+
+public class StudyService {
+
+}

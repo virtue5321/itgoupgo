@@ -1,0 +1,5 @@
+package com.itgoupgo.community.notice.model.service;
+
+public class NoticeService {
+
+}

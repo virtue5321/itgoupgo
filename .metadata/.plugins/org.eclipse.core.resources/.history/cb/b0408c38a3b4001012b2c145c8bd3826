@@ -1,0 +1,90 @@
+package com.itgoupgo.community.admin.model.service;
+
+import java.util.List;
+
+import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.itgoupgo.community.admin.model.dao.AdminDao;
+import com.itgoupgo.community.common.template.Pagination;
+import com.itgoupgo.community.member.model.vo.Member;
+
+@Service
+public class AdminService {
+
+	@Autowired
+	private SqlSessionTemplate sqlSession;
+	
+	@Autowired
+	private AdminDao adminDao; 
+	
+	/**
+     * 1. 전체 회원 수 조회 (페이징용)
+     */
+    public int selectListCount() {
+        return adminDao.selectListCount(sqlSession);
+    }
+    
+    /**
+     * 2. Pagination 객체 생성 (로직은 Service에서 처리하는 것이 일반적)
+     */
+    public Pagination getPagination(int currentPage, int listCount) {
+        // [💡 가정] 한 페이지 목록 수 10개, 페이징 버튼 수 10개로 고정
+        int pageLimit = 10;
+        int listLimit = 10; 
+        
+        return new Pagination(currentPage, listCount, pageLimit, listLimit);
+    }
+	
+    /**
+     * 3. 회원 전체 목록 조회
+     */
+	public List<Member> selectMemberList() {
+		
+		return adminDao.selectMemberList(sqlSession);
+	}
+	
+    /**
+     * 4. 회원 단일 탈퇴 (트랜잭션 적용)
+     */
+	@Transactional
+	public int deleteMemberAdmin(String userId) {
+		
+		return adminDao.deleteMemberAdmin(sqlSession, userId);
+	}
+    
+    /**
+     * 5. 일괄 회원 탈퇴 (트랜잭션 적용)
+     */
+    @Transactional
+    public int deleteCheckMember(List<Integer> memberNoList) {
+        
+        return adminDao.deleteCheckMember(sqlSession, memberNoList);
+    }
+    
+    /**
+     * 6. 회원 이름으로 검색
+     */
+    public List<Member> searchMemberByName(String memberName) {
+        return adminDao.searchMemberByName(sqlSession, memberName);
+    }
+
+    /**
+     * 7. 회원 아이디로 검색
+     */
+    public Member searchMemberById(String memberId) {
+        return adminDao.searchMemberById(sqlSession, memberId);
+    }
+    
+    // ----------------------------------------------------
+    // 🟢 6. 회원 상세 조회 기능 추가
+    // ----------------------------------------------------
+    /**
+     * 회원 상세 조회: Member 단일 객체 반환
+     */
+    public Member selectMemberDetail(int memberNo) {
+        return adminDao.selectMemberDetail(sqlSession, memberNo);
+    }
+}

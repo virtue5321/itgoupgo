@@ -1,0 +1,430 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%-- JSTL Core 태그 라이브러리 (범용 경로로 변경) --%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%-- JSTL Format 태그 라이브러리 --%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
+<!DOCTYPE html>
+
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>게시글 관리</title>
+<link rel="stylesheet" href="<c:url value="/resources/css/adminStyle.css" />">
+<style>
+/* ------------------------------------------------ /
+/ 관리자 페이지 레이아웃 (제공된 코드의 스타일) /
+/ ------------------------------------------------ /
+body { font-family: 'Malgun Gothic', 'Dotum', sans-serif; background-color: #f4f7fa; color: #333; margin: 0; padding: 0; }
+header { background-color: #5a5ce8; color: white; padding: 15px 30px; display: flex; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+header .logo { display: flex; align-items: center; font-size: 24px; font-weight: bold; }
+header .logo img { margin-right: 10px; border-radius: 50%; }
+.layout { display: flex; min-height: calc(100vh - 65px - 50px); } / 헤더, 푸터 높이 고려 /
+.sidebar { width: 250px; background-color: #ffffff; padding: 20px 0; box-shadow: 2px 0 5px rgba(0,0,0,0.05); }
+.sidebar ul { list-style: none; padding: 0; margin: 0; }
+.sidebar li a { display: block; padding: 15px 30px; text-decoration: none; color: #333; font-weight: 500; transition: background-color 0.2s; }
+.sidebar li a:hover, .sidebar li a.active { background-color: #e9e9e9; color: #5a5ce8; }
+main { flex-grow: 1; padding: 30px; }
+h1 { color: #5a5ce8; margin-top: 0; border-bottom: 2px solid #e9e9e9; padding-bottom: 10px; }
+footer { background-color: #333; color: white; text-align: center; padding: 15px 0; font-size: 14px; }
+/ 버튼 공통 스타일 */
+.btn { padding: 8px 15px; border-radius: 4px; cursor: pointer; transition: opacity 0.2s; font-weight: 500; }
+.btn-danger { background:#dc3545; color:white; border:none; }
+.btn-danger:hover { opacity: 0.9; }
+
+/* ------------------------------------------------ /
+/ 게시글 관리 기능 관련 스타일 (동적 데이터용) /
+/ ------------------------------------------------ */
+
+/* 1. 게시판 선택 버튼 컨테이너 */
+.board-select-container {
+margin-bottom: 20px;
+padding: 15px;
+background: #ffffff;
+border-radius: 10px;
+box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+.board-select-container button {
+padding: 8px 15px;
+margin-right: 5px;
+border: 1px solid #ccc;
+border-radius: 4px;
+background-color: #f8f8f8;
+cursor: pointer;
+transition: background-color 0.2s, border-color 0.2s;
+font-size: 14px;
+}
+.board-select-container button:hover {
+background-color: #e9e9e9;
+}
+.board-select-container button.active {
+background-color: #5a5ce8;
+color: white;
+border-color: #5a5ce8;
+font-weight: bold;
+}
+
+/* 2. 테이블 스타일 /
+.admin-table {
+width: 100%;
+background: white;
+border-collapse: collapse;
+text-align: center;
+border-radius: 8px;
+overflow: hidden;
+box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+.admin-table th, .admin-table td {
+padding: 12px;
+border-bottom: 1px solid #eee;
+}
+.admin-table th {
+background: #f3f4f6;
+font-weight: 600;
+color: #555;
+}
+.admin-table tbody tr:hover {
+background-color: #f9f9f9;
+}
+/ 테이블 컬럼 폭 조정 (PostVO에 맞춘 새로운 컬럼 구성) /
+.admin-table th:nth-child(2), .admin-table td:nth-child(2) { width: 10%; } / 게시판 이름 /
+.admin-table th:nth-child(3), .admin-table td:nth-child(3) { width: 45%; text-align: left; } / 제목 /
+.admin-table th:nth-child(4), .admin-table td:nth-child(4) { width: 10%; } / 작성자 /
+.admin-table th:nth-child(5), .admin-table td:nth-child(5) { width: 15%; } / 작성일 /
+.admin-table th:nth-child(6), .admin-table td:nth-child(6) { width: 5%; } / 조회수 /
+.admin-table th:nth-child(7), .admin-table td:nth-child(7) { width: 5%; } / 상태 */
+
+/* 3. 페이징바 스타일 */
+.pagination-container {
+display: flex;
+justify-content: center;
+padding: 20px 0;
+gap: 5px;
+}
+.pagination-container a, .pagination-container span {
+padding: 8px 12px;
+text-decoration: none;
+color: #333;
+border: 1px solid #ddd;
+border-radius: 4px;
+transition: background-color 0.3s;
+}
+.pagination-container a:hover {
+background-color: #f0f0f0;
+}
+.pagination-container .active {
+background-color: #5a5ce8;
+color: white;
+font-weight: bold;
+border-color: #5a5ce8;
+}
+
+/* ------------------------------------------------ /
+/ 반응형 디자인을 위한 미디어 쿼리 추가 (1000px 이하일 때 레이아웃 변경) /
+/ ------------------------------------------------ /
+@media (max-width: 1000px) {
+.layout {
+/ 사이드바와 메인 컨텐츠를 세로로 쌓습니다. */
+display: block;
+min-height: auto;
+}
+
+.sidebar {
+    /* 사이드바가 전체 너비를 차지하도록 합니다. */
+    width: 100%;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+    padding: 10px 0;
+}
+
+.sidebar ul {
+    /* 모바일에서 메뉴를 가로로 배치하고, 메뉴가 많을 경우 가로 스크롤 가능 */
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 0 20px;
+}
+
+.sidebar li {
+    /* 메뉴 항목이 가로로 나열되도록 변경 */
+    display: inline-block;
+    flex-shrink: 0; /* 메뉴가 많아도 줄어들지 않도록 설정 */
+}
+
+.sidebar li a {
+    /* 메뉴 항목 패딩 조정 */
+    padding: 10px 15px;
+    border-radius: 4px; /* 버튼처럼 보이게 */
+    margin-right: 5px;
+}
+
+main {
+    /* 메인 컨텐츠의 패딩 조정 */
+    padding: 15px;
+}
+
+/* 모바일 환경에서 테이블 가독성 향상을 위해 글꼴 크기 조정 */
+.admin-table {
+    font-size: 12px;
+}
+.admin-table th, .admin-table td {
+     padding: 8px;
+}
+/* 중요: 제목 열을 제외하고는 폭을 최소화하여 가로 스크롤 방지 */
+.admin-table th:nth-child(3), .admin-table td:nth-child(3) { width: 50%; }
+
+
+}
+</style>
+
+</head>
+<body>
+<header>
+<div class="logo">
+<img src="<c:url value="/resources/images/logo.png" />" width="40"> <!-- 로고 크기 조정 -->
+관리자 페이지
+</div>
+</header>
+
+<div class="layout">
+<aside class="sidebar">
+<ul>
+<li><a href="<c:url value="/admin/dashboard" />">🏠 대시보드</a></li>
+<li><a href="<c:url value="/admin/member" />">👥 회원 관리</a></li>
+<li><a href="<c:url value="/admin/post" />" class="active">📝 게시글 관리</a></li>
+<li><a href="<c:url value="/admin/reply" />">💬 댓글 관리</a></li>
+<li><a href="<c:url value="/admin/stats" />">📊 통계</a></li>
+<li><a href="<c:url value="/member/logout" />">🚪 로그아웃</a></li> <!-- 로그아웃 경로 추정 -->
+</ul>
+</aside>
+
+<main>
+<h1>📝 게시글 관리</h1>
+<p>전체 게시판의 게시글을 통합 관리합니다.</p>
+
+<!-- 1. 게시판별 선택 버튼 (동적 필터링) -->
+
+<!-- Controller에서 전달받은 boardList와 현재 선택된 boardCode(null/ALL이면 전체)를 사용 -->
+
+<div class="board-select-container">
+<c:forEach var="board" items="${boardList}&quot;&gt;
+&lt;button 
+class=&quot;${boardCode eq board.code ? 'active' : ''}"
+onclick="location.href='<c:url value="/admin/post?boardCode=${board.code}&cpage=1"/>'"
+>
+${board.name}
+&lt;/button&gt;
+&lt;/c:forEach&gt;
+&lt;button 
+class=&quot;${empty boardCode || boardCode eq 'ALL' ? 'active' : ''}"
+onclick="location.href='<c:url value="/admin/post?boardCode=ALL&cpage=1"/>'"
+>
+전체 게시글
+</button>
+</div>
+
+<!-- 2. 관리 버튼 및 검색 -->
+
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+<button class="btn btn-danger" onclick="deletePosts();">
+선택 항목 일괄 삭제
+</button>
+
+<!-- 검색 폼 -->
+<form action="<c:url value="/admin/post" />" method="get" style="display:flex; gap:10px; align-items:center;">
+    <!-- 현재 boardCode를 유지하기 위해 hidden 필드 추가 -->
+    <input type="hidden" name="boardCode" value="${boardCode}">
+    <select name="searchType" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+      <option value="title" ${searchType eq 'title' ? 'selected' : ''}>제목</option>
+      <option value="writer" ${searchType eq 'writer' ? 'selected' : ''}>작성자</option>
+    </select>
+    <input type="text" name="keyword" value="${keyword}" placeholder="검색어를 입력하세요" style="width: 200px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+    <button type="submit" style="background:#5a5ce8; color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer;">검색</button>
+</form>
+
+
+</div>
+
+<!-- 3. 게시글 목록 테이블 (동적 데이터) -->
+
+<table class="admin-table">
+<thead>
+<tr>
+<th style="width: 5%;">
+<input type="checkbox" id="selectAllCheckboxPost">
+</th>
+<th>게시판</th>
+<th>제목</th>
+<th>작성자</th>
+<th>작성일</th>
+<th>조회수</th>
+<th>상태</th>
+</tr>
+</thead>
+<tbody>
+<c:choose>
+<c:when test="${empty postList}&quot;&gt;
+&lt;tr&gt;
+&lt;td colspan=&quot;7&quot;&gt;조회된 게시글이 없습니다.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/c:when&gt;
+&lt;c:otherwise&gt;
+&lt;c:forEach var=&quot;post&quot; items=&quot;${postList}">
+<tr>
+<td>
+<!-- postNo와 boardCode를 조합하여 삭제 요청 시 사용 -->
+<input type="checkbox" class="itemCheckboxPost" name="postData" value="${post.boardCode}:${post.postNo}">
+</td>
+<td>${post.boardName}&lt;/td&gt;
+&lt;td&gt;
+&lt;!-- 상세 페이지 이동 링크 (실제 게시판 URL에 맞게 수정 필요) --&gt;
+&lt;a href=&quot;#&quot; class=&quot;detail-link&quot; data-post-no=&quot;${post.postNo}" data-board-code="${post.boardCode}" style="color: \#333; text-decoration: none;"\>
+${post.postTitle}
+&lt;/a&gt;
+&lt;/td&gt;
+&lt;td&gt;${post.memberNick}\</td\>
+\<td\>\<fmt:formatDate value="${post.createDate}" pattern="yyyy.MM.dd HH:mm"/></td>
+<td>${post.viewCount}\</td\>
+\<td\>
+\<c:choose\>
+\<c:when test="${post.deleteStatus eq 'Y'}"><span style="color: red; font-weight: bold;">[삭제]</span></c:when>
+<c:otherwise><span style="color: green;">[정상]</span></c:otherwise>
+</c:choose>
+</td>
+</tr>
+</c:forEach>
+</c:otherwise>
+</c:choose>
+</tbody>
+</table>
+
+<!-- 4. 페이징바 (동적 구현) -->
+
+<div class="pagination-container">
+<c:if test="${pi.currentPage &gt; 1}&quot;&gt;
+&lt;%-- 현재 boardCode, searchType, keyword를 유지하며 페이지 이동 --%&gt;
+&lt;a href=&quot;&lt;c:url value=&quot;/admin/post?boardCode=${boardCode}&cpage=${pi.currentPage - 1}&amp;searchType=${searchType}&keyword=${keyword}"/>">&lt;</a>
+</c:if>
+
+<c:forEach var="p" begin="${pi.startPage}" end="${pi.endPage}">
+    <c:choose>
+        <c:when test="${p eq pi.currentPage}">
+            <span class="active">${p}</span>
+        </c:when>
+        <c:otherwise>
+            <%-- 현재 boardCode, searchType, keyword를 유지하며 페이지 이동 --%>
+            <a href="<c:url value="/admin/post?boardCode=${boardCode}&cpage=${p}&searchType=${searchType}&keyword=${keyword}"/>">${p}</a>
+        </c:otherwise>
+    </c:choose>
+</c:forEach>
+
+<c:if test="${pi.currentPage < pi.maxPage}">
+    <%-- 현재 boardCode, searchType, keyword를 유지하며 페이지 이동 --%>
+    <a href="<c:url value="/admin/post?boardCode=${boardCode}&cpage=${pi.currentPage + 1}&searchType=${searchType}&keyword=${keyword}"/>">&gt;</a>
+</c:if>
+
+
+</div>
+</main>
+</div>
+
+<footer>ⓒ 2025 IT GO UP GO. All Rights Reserved.</footer>
+
+<script>
+// 1. 선택 게시글 일괄 삭제 기능 (AJAX 또는 Form Post를 통해 구현해야 함)
+function deletePosts() {
+const selectedCheckboxes = document.querySelectorAll('.itemCheckboxPost:checked');
+if (selectedCheckboxes.length === 0) {
+// alert() 대신 사용자 지정 UI를 사용해야 하지만, 여기서는 임시로 사용
+// 🚨 [주의] 실제 서비스에서는 alert() 대신 Modal 또는 Custom Confirm UI를 사용해야 합니다.
+alert('삭제할 게시글을 하나 이상 선택해주세요.');
+return;
+}
+
+// 🚨 중요: 폼 전송 방식 (POST)으로 구현해야 합니다.
+if (confirm(${selectedCheckboxes.length}개의 게시글을 정말 삭제하시겠습니까? (DB 상태 변경 필요))) {
+
+// 1. 임시 폼 생성 (POST 요청을 보내기 위함)
+const form = document.createElement(&#39;form&#39;);
+form.method = &#39;POST&#39;;
+form.action = &#39;&lt;c:url value=&quot;/admin/deletePosts&quot; /&gt;&#39;; // 삭제를 처리할 Controller Mapping
+
+// 2. 선택된 체크박스의 value (boardCode:postNo)를 hidden input으로 폼에 추가
+selectedCheckboxes.forEach(checkbox =&gt; {
+    const hiddenInput = document.createElement(&#39;input&#39;);
+    hiddenInput.type = &#39;hidden&#39;;
+    // 서버에서 배열로 받기 위해 name을 postDataList로 설정 (List&lt;String&gt;으로 받을 수 있음)
+    hiddenInput.name = &#39;postDataList&#39;; 
+    hiddenInput.value = checkbox.value; // 예: FREE:1, STUDY:5
+    form.appendChild(hiddenInput);
+});
+
+// 3. 현재 페이지 URL을 리다이렉트 경로로 사용하기 위해 추가
+const redirectInput = document.createElement(&#39;input&#39;);
+redirectInput.type = &#39;hidden&#39;;
+redirectInput.name = &#39;redirectUrl&#39;;
+redirectInput.value = window.location.pathname + window.location.search;
+form.appendChild(redirectInput);
+
+// 4. 폼을 body에 추가하고 전송
+document.body.appendChild(form);
+form.submit();
+
+
+}
+}
+
+// 2. 체크박스 전체 선택/해제 기능
+document.addEventListener('DOMContentLoaded', (event) => {
+// JSTL이 제대로 로드되지 않아 스크립트가 실행되지 않는 경우를 대비해 DOMContentLoaded 사용
+
+const selectAllCheckbox = document.getElementById('selectAllCheckboxPost');
+const itemCheckboxes = document.querySelectorAll('.itemCheckboxPost');
+
+if (selectAllCheckbox) {
+selectAllCheckbox.addEventListener('change', function() {
+itemCheckboxes.forEach(checkbox => {
+checkbox.checked = this.checked;
+});
+});
+}
+
+itemCheckboxes.forEach(checkbox => {
+checkbox.addEventListener('change', () => {
+const checkedItems = document.querySelectorAll('.itemCheckboxPost:checked').length;
+if (!checkbox.checked) {
+if (selectAllCheckbox) selectAllCheckbox.checked = false;
+} else if (checkedItems === itemCheckboxes.length) {
+if (selectAllCheckbox) selectAllCheckbox.checked = true;
+}
+});
+});
+
+});
+
+// 3. 게시글 상세 조회 링크 클릭 시 처리 (Controller에서 처리할 필요가 있음)
+document.querySelectorAll('.detail-link').forEach(link => {
+link.addEventListener('click', function(e) {
+e.preventDefault();
+const postNo = this.dataset.postNo;
+const boardCode = this.dataset.boardCode.toLowerCase(); // URL에 맞게 소문자로 변환
+
+// 게시판 코드에 따라 상세 페이지 이동 URL이 달라집니다.
+// 예: /free/detail?no=10, /study/detail?no=5
+
+// 🚨 이 부분은 실제 게시판의 상세 조회 URL 규칙에 맞게 수정해야 합니다.
+const detailUrl = `/${boardCode}/detail?no=${postNo}`;
+
+// 임시로 alert 처리
+// alert(`[${this.dataset.boardCode}] 게시판의 ${postNo}번 글 상세 페이지로 이동합니다. (URL: ${detailUrl})`);
+
+location.href = detailUrl; // 실제 이동 코드
+
+
+});
+
+});
+</script>
+
+</body>
+</html>

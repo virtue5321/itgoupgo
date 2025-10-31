@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="adminMapper">
+	
+	<resultMap id="memberResultSet" type="member">
+		<id column="MEMBER_NO" property="memberNo" />
+		<result column="MEMBER_ID" property="memberId" />
+		<result column="MEMBER_PWD" property="memberPwd" />
+		<result column="MEMBER_NAME" property="memberName" />
+		<result column="MEMBER_NICK" property="memberNick" />
+		<result column="MEMBER_BIRTH_DATE" property="memberBirthDate" />
+		<result column="GENDER" property="gender" />
+		<result column="EMAIL" property="email" />
+		<result column="PHONE" property="phone" />
+		<result column="ENROLL_DATE" property="enrollDate" />
+		<result column="MEMBER_STATUS" property="memberStatus" />
+	</resultMap>
+	
+	<resultMap id="freeResultSet" type="free">
+		<id column="FREE_NO" property="freeNo" />
+		<result column="FREE_TITLE" property="freeTitle" />
+		<result column="FREE_CONTENT" property="freeContent" />
+		<result column="FREE_CREATE_DATE" property="freeCreateDate" />
+		<result column="FREE_VIEW" property="freeView" />
+		<result column="FREE_DELETE_STATUS" property="freeDeleteStatus" />
+		<result column="MEMBER_NO" property="memberNo" />
+		<result column="MEMBER_NICK" property="memberNick" />
+    </resultMap>
+    
+    <resultMap id="infoResultSet" type="info">
+		<id column="INFO_NO" property="infoNo" />
+		<result column="INFO_TITLE" property="infoTitle" />
+		<result column="INFO_CONTENT" property="infoContent" />
+		<result column="INFO_CREATE_DATE" property="infoCreateDate" />
+		<result column="INFO_VIEW" property="infoView" />
+		<result column="INFO_CATEGORY" property="infoCategory" /> <result column="INFO_DELETE_STATUS" property="infoDeleteStatus" />
+		<result column="MEMBER_NO" property="memberNo" />
+		<result column="MEMBER_NICK" property="memberNick" />
+    </resultMap>
+    
+    <resultMap id="itResultSet" type="it">
+    	<id column="IT_NO" property="itNo" />
+    	<result column="IT_TITLE" property="itTitle" />
+    	<result column="THUMBNAIL" property="thumnail" />
+    	<result column="IT_CONTENT" property="itContent" />
+    	<result column="REPORTER" property="reporter" />
+    	<result column="NEWSPAPER" property="newsPaper" />
+    	<result column="IT_CREATE_DATE" property="itCreateDate" />
+    	<result column="IT_VIEW" property="itView" />
+    	<result column="IT_DELETE_STATUS" property="itDeleteStatus" />
+    </resultMap>
+    
+    <resultMap id="knowledgeResultSet" type="knowledge">
+    	<id column="KNOWLEDGE_NO" property="knowledgeNo" />
+    	<result column="KNOWLEDGE_TITLE" property="knowledgeTitle" />
+    	<result column="KNOWLEDGE_CONTENT" property="knowledgeContent" />
+    	<result column="KNOWLEDGE_CREATE_DATE" property="knowledgeCreateDate" />
+    	<result column="KNOWLEDGE_VIEW" property="knowledgeView" />
+    	<result column="KNOWLEDGE_CATEGORY" property="knowledgeCategory" />
+    	<result column="KNOWLEDGE_DELETE_STATUS" property="knowledgeDeleteStatus" />
+    	<result column="MEMBER_NO" property="memberNo" />
+    	<result column="MEMBER_NICK" property="memberNick" />
+    </resultMap>
+    
+    <resultMap id="studyResultSet" type="study">
+		<id column="STUDY_NO" property="studyNo" />
+		<result column="STUDY_TITLE" property="studyTitle" />
+		<result column="STUDY_CONTENT" property="studyContent" />
+		<result column="STUDY_CREATE_DATE" property="studyCreateDate" />
+		<result column="STUDY_VIEW" property="studyView" />
+		<result column="STUDY_CATEGORY" property="studyCategory" /> <result column="STUDY_DELETE_STATUS" property="studyDeleteStatus" />
+		<result column="MEMBER_NO" property="memberNo" />
+		<result column="MEMBER_NICK" property="memberNick" />
+    </resultMap>
+    
+    <resultMap id="noticeResultSet" type="notice">
+    	<id column="NOTICE_NO" property="noticeNo" />
+    	<result column="NOTICE_TITLE" property="noticeTitle" />
+    	<result column="NOTICE_CONTENT" property="noticeContent" />
+    	<result column="NOTICE_CREATE_DATE" property="noticeCreateDate" />
+    	<result column="NOTICE_VIEW" property="noticeView" />
+    	<result column="NOTICE_DELETE_STATUS" property="noticeDeleteStatus" />
+    </resultMap>
+	
+	<select id="selectMemberList" resultMap="memberResultSet">
+		SELECT
+			MEMBER_NO,
+			MEMBER_ID,
+			MEMBER_NAME,
+			GENDER,
+			PHONE,
+			EMAIL,
+			ENROLL_DATE,
+			MEMBER_STATUS
+		FROM MEMBER
+		ORDER BY ENROLL_DATE DESC
+	</select>
+	
+	<update id="deleteMemberAdmin" parameterType="string">
+		UPDATE MEMBER
+		   SET MEMBER_STATUS = 'N'
+		 WHERE MEMBER_ID = #{memberId}
+		   AND MEMBER_STATUS = 'Y'
+	</update>
+	
+	<update id="deleteCheckMember" parameterType="java.util.List">
+        UPDATE MEMBER
+           SET MEMBER_STATUS = 'N'
+         WHERE MEMBER_NO IN
+        <foreach collection="list" item="memberNo" open="(" separator="," close=")">
+            #{memberNo}
+        </foreach>
+           AND MEMBER_STATUS = 'Y'
+    </update>
+	
+	<select id="searchMemberByName" resultMap="memberResultSet">
+		SELECT
+			MEMBER_NO,
+			MEMBER_ID,
+			MEMBER_NAME,
+			GENDER,
+			PHONE,
+			EMAIL,
+			ENROLL_DATE,
+			MEMBER_STATUS
+		  FROM MEMBER
+		 WHERE MEMBER_NAME LIKE '%' || #{memberName} || '%' 
+	</select>
+	
+	<select id="searchMemberById" resultMap="memberResultSet">
+		SELECT
+			MEMBER_NO,
+			MEMBER_ID,
+			MEMBER_NAME,
+			GENDER,
+			PHONE,
+			EMAIL,
+			ENROLL_DATE,
+			MEMBER_STATUS
+		  FROM MEMBER
+		 WHERE MEMBER_ID = #{memberId}
+	</select>
+	
+	<select id="selectMemberDetail" resultMap="memberResultSet" parameterType="_int">
+	    SELECT
+	        *
+	    FROM MEMBER
+	    WHERE MEMBER_NO = #{memberNo}
+	</select>
+	
+	<select id="selectListCount" resultType="_int">
+        SELECT COUNT(*) FROM MEMBER
+    </select>
+    
+    <select id="selectFreeListCount" resultType="_int">
+        SELECT COUNT(*) FROM FREE_BBS 
+    </select>
+    
+    <select id="selectFreeList" resultMap="freeResultSet">
+    	SELECT 
+            T1.FREE_NO,
+            T1.FREE_TITLE,
+            T2.MEMBER_NICK,
+            T1.FREE_CREATE_DATE,
+            T1.FREE_VIEW,
+            T1.FREE_DELETE_STATUS, T1.MEMBER_NO
+          FROM FREE_BBS T1
+          JOIN MEMBER T2 ON T1.MEMBER_NO = T2.MEMBER_NO  ORDER BY T1.FREE_NO DESC
+    </select>
+    
+    <update id="deleteFreeBbs" parameterType="_int">
+    	UPDATE FREE_BBS
+    	   SET FREE_DELETE_STATUS = 'Y'
+    	 WHERE FREE_NO = #{bbsNo}
+    	   AND FREE_DELETE_STATUS = 'N'
+    </update>
+
+    <update id="deleteFreeBbsCheck" parameterType="list">
+    	UPDATE FREE_BBS
+    	   SET FREE_DELETE_STATUS = 'Y'
+    	 WHERE FREE_NO IN
+    	 <foreach collection="list" item="bbsNo" open="(" separator="," close=")">
+    	 	#{bbsNo}
+    	 </foreach>
+    	   AND FREE_DELETE_STATUS = 'N'
+    </update>
+    
+    
+    <select id="selectInfoListCount" resultType="_int">
+        SELECT COUNT(*) FROM INFO_BBS 
+    </select>
+    
+    <select id="selectInfoList" resultMap="infoResultSet">
+    	SELECT 
+            T1.INFO_NO,
+            T1.INFO_TITLE,
+            T2.MEMBER_NICK,
+            T1.INFO_CREATE_DATE,
+            T1.INFO_VIEW,
+            T1.INFO_CATEGORY, T1.INFO_DELETE_STATUS, T1.MEMBER_NO
+          FROM INFO_BBS T1
+          JOIN MEMBER T2 ON T1.MEMBER_NO = T2.MEMBER_NO  
+          ORDER BY T1.INFO_NO DESC
+    </select>
+    
+    <update id="deleteInfoBbs" parameterType="_int">
+    	UPDATE INFO_BBS
+    	   SET INFO_DELETE_STATUS = 'Y'
+    	 WHERE INFO_NO = #{infoNo}
+    	   AND INFO_DELETE_STATUS = 'N'
+    </update>
+
+    <update id="deleteInfoBbsCheck" parameterType="list">
+    	UPDATE INFO_BBS
+    	   SET INFO_DELETE_STATUS = 'Y'
+    	 WHERE INFO_NO IN
+    	 <foreach collection="list" item="infoNo" open="(" separator="," close=")">
+    	 	#{infoNo}
+    	 </foreach>
+    	   AND INFO_DELETE_STATUS = 'N'
+    </update>
+    
+    
+    <select id="selectItListCount" resultType="_int">
+        SELECT COUNT(*) FROM IT_BBS 
+    </select>
+    
+    <select id="selectItList" resultMap="itResultSet">
+    	SELECT
+            IT_NO,
+            IT_TITLE,
+            IT_CREATE_DATE,
+            IT_VIEW,
+            IT_DELETE_STATUS, THUMBNAIL, REPORTER, NEWSPAPER
+          FROM IT_BBS
+          ORDER BY IT_NO DESC
+    </select>
+    
+    <update id="deleteItBbs" parameterType="_int">
+    	UPDATE IT_BBS
+    	   SET IT_DELETE_STATUS = 'Y'
+    	 WHERE IT_NO = #{itNo}
+    	   AND IT_DELETE_STATUS = 'N'
+    </update>
+    
+    <update id="deleteItBbsCheck" parameterType="list">
+    	UPDATE IT_BBS
+    	   SET IT_DELETE_STATUS = 'Y'
+    	 WHERE IT_NO IN
+    	 <foreach collection="list" item="itNo" open="(" separator="," close=")">
+    	 	#{itNo}
+    	 </foreach>
+    	   AND IT_DELETE_STATUS = 'N'
+    </update>
+    
+    
+    <select id="selectStudyListCount" resultType="_int">
+        SELECT COUNT(*) FROM STUDY_BBS 
+    </select>
+    
+    <select id="selectStudyList" resultMap="studyResultSet">
+    	SELECT 
+            T1.STUDY_NO,
+            T1.STUDY_TITLE,
+            T2.MEMBER_NICK,
+            T1.STUDY_CREATE_DATE,
+            T1.STUDY_VIEW,
+            T1.STUDY_CATEGORY,
+            T1.STUDY_DELETE_STATUS, T1.MEMBER_NO
+          FROM STUDY_BBS T1
+          JOIN MEMBER T2 ON T1.MEMBER_NO = T2.MEMBER_NO  
+          ORDER BY T1.STUDY_NO DESC
+    </select>
+    
+    <update id="deleteStudyBbs" parameterType="_int">
+    	UPDATE STUDY_BBS
+    	   SET STUDY_DELETE_STATUS = 'Y'
+    	 WHERE STUDY_NO = #{studyNo}
+    	   AND STUDY_DELETE_STATUS = 'N'
+    </update>
+
+    <update id="deleteStudyBbsCheck" parameterType="list">
+    	UPDATE STUDY_BBS
+    	   SET STUDY_DELETE_STATUS = 'Y'
+    	 WHERE STUDY_NO IN
+    	 <foreach collection="list" item="studyNo" open="(" separator="," close=")">
+    	 	#{studyNo}
+    	 </foreach>
+    	   AND STUDY_DELETE_STATUS = 'N'
+    </update>
+
+
+    <select id="selectNoticeListCount" resultType="_int">
+        SELECT COUNT(*) FROM NOTICE
+    </select>
+    
+    <select id="selectNoticeList" resultMap="noticeResultSet">
+    	SELECT 
+            NOTICE_NO,
+            NOTICE_TITLE,
+            NOTICE_CREATE_DATE,
+            NOTICE_VIEW,
+            NOTICE_DELETE_STATUS
+          FROM NOTICE
+          ORDER BY NOTICE_NO DESC
+    </select>
+    
+    <update id="deleteNoticeBbs" parameterType="_int">
+    	UPDATE NOTICE_BBS
+    	   SET NOTICE_DELETE_STATUS = 'Y'
+    	 WHERE NOTICE_NO = #{noticeNo}
+    	   AND NOTICE_DELETE_STATUS = 'N'
+    </update>
+
+    <update id="deleteNoticeBbsCheck" parameterType="list">
+    	UPDATE NOTICE_BBS
+    	   SET NOTICE_DELETE_STATUS = 'Y'
+    	 WHERE NOTICE_NO IN
+    	 <foreach collection="list" item="noticeNo" open="(" separator="," close=")">
+    	 	#{noticeNo}
+    	 </foreach>
+    	   AND NOTICE_DELETE_STATUS = 'N'
+    </update>
+
+
+    <select id="selectKnowledgeListCount" resultType="_int">
+        SELECT COUNT(*) FROM KNOWLEDGE_BBS 
+    </select>
+    
+    <select id="selectKnowledgeList" resultMap="knowledgeResultSet">
+    	SELECT 
+            T1.KNOWLEDGE_NO,
+            T1.KNOWLEDGE_TITLE,
+            T2.MEMBER_NICK,
+            T1.KNOWLEDGE_CREATE_DATE,
+            T1.KNOWLEDGE_VIEW,
+            T1.KNOWLEDGE_CATEGORY,
+            T1.KNOWLEDGE_DELETE_STATUS, T1.MEMBER_NO
+          FROM KNOWLEDGE_BBS T1
+          JOIN MEMBER T2 ON T1.MEMBER_NO = T2.MEMBER_NO  
+          ORDER BY T1.KNOWLEDGE_NO DESC
+    </select>
+    
+    <update id="deleteKnowledgeBbs" parameterType="_int">
+    	UPDATE KNOWLEDGE_BBS
+    	   SET KNOWLEDGE_DELETE_STATUS = 'Y'
+    	 WHERE KNOWLEDGE_NO = #{knowledgeNo}
+    	   AND KNOWLEDGE_DELETE_STATUS = 'N'
+    </update>
+
+    <update id="deleteKnowledgeBbsCheck" parameterType="list">
+    	UPDATE KNOWLEDGE_BBS
+    	   SET KNOWLEDGE_DELETE_STATUS = 'Y'
+    	 WHERE KNOWLEDGE_NO IN
+    	 <foreach collection="list" item="knowledgeNo" open="(" separator="," close=")">
+    	 	#{knowledgeNo}
+    	 </foreach>
+    	   AND KNOWLEDGE_DELETE_STATUS = 'N'
+    </update>
+    
+</mapper>

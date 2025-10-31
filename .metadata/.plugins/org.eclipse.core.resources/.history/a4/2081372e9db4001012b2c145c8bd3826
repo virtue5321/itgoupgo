@@ -1,0 +1,62 @@
+package com.itgoupgo.community.admin.model.dao;
+
+import java.util.List;
+import java.util.Map; // Map import 추가
+
+import org.apache.ibatis.session.RowBounds;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.stereotype.Repository;
+
+import com.itgoupgo.community.common.model.vo.PageInfo;
+import com.itgoupgo.community.member.model.vo.Member;
+
+@Repository
+public class AdminDao {
+	
+    // 💡 1. 전체 회원 수 조회
+    public int selectListCount(SqlSessionTemplate sqlSession) {
+        return sqlSession.selectOne("adminMapper.selectListCount");
+    }
+    
+    // 💡 2. 페이징 처리된 전체 회원 목록 조회 (RowBounds 사용)
+ 	public List<Member> selectMemberList(SqlSessionTemplate sqlSession, PageInfo pi) {
+ 	
+         int limit = pi.getBoardLimit(); // 💡 Controller에서 10으로 설정한 값이 여기로 들어옴
+         int offset = (pi.getCurrentPage() - 1) * limit; 
+         
+         RowBounds rowBounds = new RowBounds(offset, limit); // 💡 limit: 10
+         
+ 		return sqlSession.selectList("adminMapper.selectMemberList", null, rowBounds); 
+ 	}
+ 	
+    // 🚩 3. 검색 조건에 맞는 회원 수 조회
+    public int selectSearchListCount(SqlSessionTemplate sqlSession, Map<String, String> searchMap) {
+        return sqlSession.selectOne("adminMapper.selectSearchListCount", searchMap);
+    }
+
+    // 🚩 4. 검색 조건에 맞는 페이징 처리된 목록 조회 (RowBounds 사용)
+    public List<Member> selectSearchMemberList(SqlSessionTemplate sqlSession, PageInfo pi, Map<String, String> searchMap) {
+        
+        int limit = pi.getBoardLimit(); // 💡 Controller에서 10으로 설정한 값을 가져옴
+        int offset = (pi.getCurrentPage() - 1) * limit;
+
+        RowBounds rowBounds = new RowBounds(offset, limit); // 💡 limit: 10
+
+        return sqlSession.selectList("adminMapper.selectSearchMemberList", searchMap, rowBounds);
+    }
+ 	
+    // 💡 5. 단일 회원 탈퇴
+	public int deleteMemberAdmin(SqlSessionTemplate sqlSession, String memberId) {
+		return sqlSession.update("adminMapper.deleteMemberAdmin", memberId);
+	}
+	
+    // 💡 6. 일괄 회원 탈퇴
+	public int deleteCheckMember(SqlSessionTemplate sqlSession, List<Integer> memberNoList) {
+		return sqlSession.update("adminMapper.deleteCheckMember", memberNoList);
+	}
+	
+    // 💡 7. 회원 상세 조회
+	public Member selectMemberDetail(SqlSessionTemplate sqlSession, int memberNo) {
+		return sqlSession.selectOne("adminMapper.selectMemberDetail", memberNo);
+    }
+}

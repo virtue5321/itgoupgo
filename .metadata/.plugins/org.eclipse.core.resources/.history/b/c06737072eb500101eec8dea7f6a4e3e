@@ -1,0 +1,133 @@
+package com.itgoupgo.community.admin.model.service;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.itgoupgo.community.admin.model.dao.AdminDao;
+import com.itgoupgo.community.admin.model.vo.PostVO;
+import com.itgoupgo.community.common.model.vo.Pagination;
+import com.itgoupgo.community.member.model.vo.Member;
+
+@Service
+public class AdminService {
+
+	@Autowired
+	private SqlSessionTemplate sqlSession;
+	
+	@Autowired
+	private AdminDao adminDao; 
+	
+	/**
+     * 1. 전체 회원 수 조회 (페이징용)
+     */
+    public int selectListCount() {
+        return adminDao.selectListCount(sqlSession);
+    }
+    
+    /**
+     * 2. Pagination 객체 생성 (로직은 Service에서 처리하는 것이 일반적)
+     */
+    public Pagination getPagination(int currentPage, int listCount) {
+        // [💡 가정] 한 페이지 목록 수 10개, 페이징 버튼 수 10개로 고정
+        int pageLimit = 10;
+        int listLimit = 10; 
+        
+        return new Pagination(currentPage, listCount, pageLimit, listLimit);
+    }
+	
+    /**
+     * 3. 회원 전체 목록 조회
+     */
+	public List<Member> selectMemberList(Pagination pageInfo) {
+		
+		return adminDao.selectMemberList(sqlSession, pageInfo);
+	}
+	
+    /**
+     * 4. 회원 단일 탈퇴 (트랜잭션 적용)
+     */
+	@Transactional
+	public int deleteMemberAdmin(String userId) {
+		
+		return adminDao.deleteMemberAdmin(sqlSession, userId);
+	}
+    
+    /**
+     * 5. 일괄 회원 탈퇴 (트랜잭션 적용)
+     */
+    @Transactional
+    public int deleteCheckMember(List<Integer> memberNoList) {
+        
+        return adminDao.deleteCheckMember(sqlSession, memberNoList);
+    }
+    
+    /**
+     * 6. 회원 이름으로 검색
+     */
+    public List<Member> searchMemberByName(String memberName) {
+        return adminDao.searchMemberByName(sqlSession, memberName);
+    }
+
+    /**
+     * 7. 회원 아이디로 검색
+     */
+    public Member searchMemberById(String memberId) {
+        return adminDao.searchMemberById(sqlSession, memberId);
+    }
+    
+    // ----------------------------------------------------
+    // 🟢 6. 회원 상세 조회 기능 추가
+    // ----------------------------------------------------
+    /**
+     * 회원 상세 조회: Member 단일 객체 반환
+     */
+    public Member selectMemberDetail(int memberNo) {
+        return adminDao.selectMemberDetail(sqlSession, memberNo);
+    }
+    
+    /**
+     * 게시판 전체 목록 조회 (게시글 관리 페이지 필터링용)
+     * @return 게시판 목록 List<BoardVO>
+     */
+    public List<BoardVO> selectBoardList() {
+        return adminDao.selectBoardList(sqlSession);
+    }
+
+    /**
+     * 검색 및 필터링 조건에 맞는 게시글의 총 개수 조회
+     * @param searchConditions 검색/필터링 조건을 담은 Map (boardCode, searchType, keyword)
+     * @return 조건에 맞는 게시글의 총 개수
+     */
+    public int selectPostListCount(Map<String, Object> searchConditions) {
+        return adminDao.selectPostListCount(sqlSession, searchConditions);
+    }
+
+    /**
+     * 게시글 목록 조회 (페이징, 검색, 필터링 적용)
+     * @param searchConditions 페이징 정보(pi), 검색/필터링 조건을 담은 Map
+     * @return 게시글 목록 List<PostVO>
+     */
+    public List<PostVO> selectPostList(Map<String, Object> searchConditions) {
+        return adminDao.selectPostList(sqlSession, searchConditions);
+    }
+
+    /**
+     * 게시글 일괄 삭제 (게시글 상태를 'N'으로 변경)
+     * @param postDataList 게시글 코드와 번호를 담은 List<String> (예: "FREE:100", "STUDY:90")
+     * @return 처리된 게시글 개수
+     */
+    @Transactional
+    public int deleteCheckPosts(List<String> postDataList) {
+        // 일괄 삭제 처리는 트랜잭션이 적용되어야 합니다.
+        // DAO에서 List<String>을 받아 forEach 등으로 반복 처리하거나, Mybatis에서 foreach 태그를 사용해야 합니다.
+        return adminDao.deleteCheckPosts(sqlSession, postDataList);
+    }
+
+    
+}

@@ -1,0 +1,47 @@
+package com.itgoupgo.community.free.model.service;
+
+import java.util.HashMap;
+import java.util.List;
+
+import org.apache.jasper.compiler.PageInfo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.itgoupgo.community.common.model.vo.Pagination;
+import com.itgoupgo.community.free.model.dao.FreeBoardDao;
+import com.itgoupgo.community.free.model.vo.FreeBbs;
+
+@Service
+public class FreeBoardService {
+
+	@Autowired
+	private FreeBoardDao boardDao;
+	
+	private static final int BOARD_LIMIT = 10;	// 한 페이지당 게시글 수
+	private static final int PAGE_LIMIT = 10;	// 페이지바에 보여질 페이지 수
+	
+	// 자유게시글 총 개수 조회
+	public PageInfo getPageInfo(int currentPage) {
+		int listCount = boardDao.getListCount();
+		PageInfo pi = Pagination.getPageInfo(listCount, currentPage, PAGE_LIMIT, BOARD_LIMIT);
+		return pi;
+	}
+	
+	// 자유게시글 여러행 조회
+	public List<FreeBbs> selectFreeBoardList(PageInfo pi) {
+		List<FreeBbs> list = boardDao.selectFreeBoardList(pi);
+		return list;
+	}
+
+	//검색된 게시글의 갯수를 조회
+    public int getSearchCount(HashMap<String, String> map) {
+		return boardDao.getSearchCount(map);
+    }
+
+	public PageInfo getPageInfo(int currentPage, HashMap<String, String> map) {
+		int searchCount = boardDao.getSearchCount(map);
+		PageInfo pi = Pagination.getPageInfo(searchCount, currentPage, PAGE_LIMIT, BOARD_LIMIT);
+		return pi;
+	}
+
+}

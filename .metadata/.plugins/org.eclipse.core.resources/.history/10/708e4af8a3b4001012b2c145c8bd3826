@@ -1,0 +1,81 @@
+package com.itgoupgo.community.common.model.vo;
+
+// Pagination 객체는 페이징 처리에 필요한 모든 정보를 담는 VO(Value Object)입니다.
+public class Pagination {
+	
+	// 필드
+	private int listCount; 		// 현재 총 게시글(또는 회원) 수
+	private int currentPage; 	// 현재 페이지 (사용자 요청 값)
+	private int pageLimit; 		// 페이징 바에 보여질 버튼 수 (10개 고정)
+	private int listLimit; 		// 한 페이지에 보여질 목록 수 (10개 고정)
+	
+	private int maxPage; 		// 가장 마지막 페이지 (총 페이지 수)
+	private int startPage; 		// 페이징 바의 시작 수
+	private int endPage; 		// 페이징 바의 끝 수
+	
+	// Spring에서 기본 생성자를 사용하지 않을 경우를 대비해 필요
+	public Pagination() {}
+
+    // 💡 에러 해결을 위한 필수 생성자: AdminService에서 호출하는 생성자
+	public Pagination(int currentPage, int listCount, int pageLimit, int listLimit) {
+		this.currentPage = currentPage;
+		this.listCount = listCount;
+		this.pageLimit = pageLimit;
+		this.listLimit = listLimit;
+		
+		// 나머지 페이징 계산 로직 실행
+		calcPagination();
+	}
+	
+    /**
+     * 페이징 처리 계산 로직
+     */
+	private void calcPagination() {
+		
+        /* 1. maxPage (가장 마지막 페이지) 계산 */
+		this.maxPage = (int)Math.ceil((double)listCount / listLimit);
+        
+        /* 2. startPage (페이징 바의 시작 수) 계산 */
+		// (currentPage - 1) / pageLimit * pageLimit + 1
+		this.startPage = (currentPage - 1) / pageLimit * pageLimit + 1;
+		
+        /* 3. endPage (페이징 바의 끝 수) 계산 */
+		// startPage + pageLimit - 1
+		this.endPage = startPage + pageLimit - 1;
+		
+        /* 4. endPage가 maxPage보다 클 경우, endPage를 maxPage로 조정 */
+		if(this.endPage > this.maxPage) {
+			this.endPage = this.maxPage;
+		}
+	}
+	
+	// 💡 에러 해결을 위한 필수 Getter 메서드 (AdminController, AdminDao에서 사용)
+	public int getListCount() {
+		return listCount;
+	}
+
+	public int getCurrentPage() {
+		return currentPage;
+	}
+
+	public int getPageLimit() {
+		return pageLimit;
+	}
+
+	public int getListLimit() {
+		return listLimit;
+	}
+    
+    // JSP에서 사용하는 나머지 Getter 메서드 (필요에 따라 Setter도 추가 가능)
+    public int getMaxPage() {
+		return maxPage;
+	}
+
+	public int getStartPage() {
+		return startPage;
+	}
+
+	public int getEndPage() {
+		return endPage;
+	}
+}

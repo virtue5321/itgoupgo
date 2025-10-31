@@ -1,0 +1,20 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
+<footer>
+  <div class="footer-logo">
+    <a href="/community">
+      <img src="/community/resources/images/itgoupgo_logo.png" alt="ITGOUPGO 로고">
+    </a>
+  </div>
+
+  <div class="footer-links">
+    <a href="/community/about">회사소개</a> |
+    <a href="/community/policy">운영정책</a> |
+    <a href="/community/privacy">개인정보처리방침</a> |
+    <a href="/community/contact">문의하기</a>
+  </div>
+
+  <div class="copyright">
+    © 2025 ITGOUPGO. All rights reserved.
+  </div>
+</footer>

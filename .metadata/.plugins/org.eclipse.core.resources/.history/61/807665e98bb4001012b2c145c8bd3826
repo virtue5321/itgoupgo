@@ -1,0 +1,42 @@
+package com.itgoupgo.community.admin.model.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.session.RowBounds; // 💡 [추가] RowBounds import
+import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.stereotype.Repository;
+
+import com.itgoupgo.community.common.model.vo.PageInfo; // 💡 [추가] PageInfo import
+import com.itgoupgo.community.member.model.vo.Member;
+
+@Repository
+public class AdminDao {
+	
+    // 💡 [추가] 1. 전체 회원 수 조회
+    public int selectListCount(SqlSessionTemplate sqlSession) {
+        return sqlSession.selectOne("adminMapper.selectListCount");
+    }
+
+    // 💡 [수정] 2. 페이징 처리된 목록 조회 메소드
+	public List<Member> selectMemberList(SqlSessionTemplate sqlSession, PageInfo pi) {
+		
+        // RowBounds를 이용해 Mybatis에게 offset(건너뛸 갯수)과 limit(조회할 갯수)을 전달
+        int limit = pi.getBoardLimit();
+        int offset = (pi.getCurrentPage() - 1) * limit;
+        
+        RowBounds rowBounds = new RowBounds(offset, limit);
+        
+        // selectList 호출 시 파라미터는 null, RowBounds 객체를 전달
+		return sqlSession.selectList("adminMapper.selectMemberList", null, rowBounds);
+	}
+	
+    public Member selectMemberDetail(SqlSessionTemplate sqlSession, String memberId) {
+		//... (기존 로직 유지)
+		return sqlSession.selectOne("adminMapper.selectMemberDetail", memberId);
+	}
+
+	public int deleteMemberAdmin(SqlSessionTemplate sqlSession, String userId) {
+		//... (기존 로직 유지)
+		return sqlSession.update("adminMapper.deleteMemberAdmin", userId);
+	}
+}

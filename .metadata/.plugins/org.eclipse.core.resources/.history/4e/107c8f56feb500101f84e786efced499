@@ -1,0 +1,238 @@
+package com.itgoupgo.community.admin.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.itgoupgo.community.admin.model.service.FreeBbsService;
+import com.itgoupgo.community.admin.model.service.InfoBbsService;
+import com.itgoupgo.community.admin.model.service.ItService;
+import com.itgoupgo.community.admin.model.service.KnowledgeService;
+import com.itgoupgo.community.admin.model.service.StudyService;
+import com.itgoupgo.community.admin.model.service.NoticeService;
+
+@Controller
+public class AdminController {
+    
+    @Autowired
+    private FreeBbsService freeBbsService;
+    
+    @Autowired
+    private InfoBbsService infoBbsService;
+
+    @Autowired
+    private ItService itService;
+
+    @Autowired
+    private KnowledgeService knowledgeService;
+
+    @Autowired
+    private StudyService studyService;
+
+    @Autowired
+    private NoticeService noticeService;
+
+    // ================================================================
+    // 📌 자유게시판 관리
+    // ================================================================
+    @GetMapping("/admin/freeBbsManage")
+    public String freeBbsManage(Model model) {
+        List<?> freeList = freeBbsService.selectFreeBbsList();
+        model.addAttribute("freeList", freeList);
+        return "admin/postManage/freeBbsManage";
+    }
+
+    @GetMapping("/admin/deleteFreeBbs")
+    public String deleteFreeBbs(@RequestParam("bbsNo") int bbsNo, RedirectAttributes ra) {
+        int result = freeBbsService.deleteFreeBbs(bbsNo);
+        ra.addFlashAttribute("message", result > 0
+            ? bbsNo + "번 자유게시판 게시글이 삭제되었습니다."
+            : "삭제 중 오류가 발생했습니다.");
+        return "redirect:/admin/freeBbsManage";
+    }
+
+    @PostMapping("/admin/deleteFreeBbsCheck")
+    public String deleteFreeBbsCheck(@RequestParam(value="bbsNoList", required=false) List<Integer> bbsNoList,
+                                     RedirectAttributes ra) {
+        if (bbsNoList == null || bbsNoList.isEmpty()) {
+            ra.addFlashAttribute("message", "선택된 게시글이 없습니다.");
+            return "redirect:/admin/freeBbsManage";
+        }
+
+        int result = freeBbsService.deleteFreeBbsCheck(bbsNoList);
+        ra.addFlashAttribute("message",
+            "총 " + result + "건의 자유게시판 게시글이 일괄 삭제되었습니다.");
+        return "redirect:/admin/freeBbsManage";
+    }
+
+    // ================================================================
+    // 📌 정보공유게시판 관리
+    // ================================================================
+    @GetMapping("/admin/infoBbsManage")
+    public String infoBbsManage(Model model) {
+        List<?> infoList = infoBbsService.selectInfoBbsList();
+        model.addAttribute("infoList", infoList);
+        return "admin/postManage/infoBbsManage";
+    }
+
+    @GetMapping("/admin/deleteInfoBbs")
+    public String deleteInfoBbs(@RequestParam("bbsNo") int bbsNo, RedirectAttributes ra) {
+        int result = infoBbsService.deleteInfoBbs(bbsNo);
+        ra.addFlashAttribute("message", result > 0
+            ? bbsNo + "번 정보공유 게시글이 삭제되었습니다."
+            : "삭제 중 오류가 발생했습니다.");
+        return "redirect:/admin/infoBbsManage";
+    }
+
+    @PostMapping("/admin/deleteInfoBbsCheck")
+    public String deleteInfoBbsCheck(@RequestParam(value="bbsNoList", required=false) List<Integer> bbsNoList,
+                                     RedirectAttributes ra) {
+        if (bbsNoList == null || bbsNoList.isEmpty()) {
+            ra.addFlashAttribute("message", "선택된 게시글이 없습니다.");
+            return "redirect:/admin/infoBbsManage";
+        }
+
+        int result = infoBbsService.deleteInfoBbsCheck(bbsNoList);
+        ra.addFlashAttribute("message",
+            "총 " + result + "건의 정보공유 게시글이 일괄 삭제되었습니다.");
+        return "redirect:/admin/infoBbsManage";
+    }
+
+    // ================================================================
+    // 📌 IT뉴스 게시판 관리
+    // ================================================================
+    @GetMapping("/admin/itBbsManage")
+    public String itBbsManage(Model model) {
+        List<?> itList = itService.selectItBbsList();
+        model.addAttribute("itList", itList);
+        return "admin/postManage/itBbsManage";
+    }
+
+    @GetMapping("/admin/deleteItBbs")
+    public String deleteItBbs(@RequestParam("itNo") int itNo, RedirectAttributes ra) {
+        int result = itService.deleteItBbs(itNo);
+        ra.addFlashAttribute("message", result > 0
+            ? itNo + "번 IT뉴스 게시글이 삭제되었습니다."
+            : "삭제 중 오류가 발생했습니다.");
+        return "redirect:/admin/itBbsManage";
+    }
+
+    @PostMapping("/admin/deleteItBbsCheck")
+    public String deleteItBbsCheck(@RequestParam(value="bbsNoList", required=false) List<Integer> bbsNoList,
+                                   RedirectAttributes ra) {
+        if (bbsNoList == null || bbsNoList.isEmpty()) {
+            ra.addFlashAttribute("message", "선택된 게시글이 없습니다.");
+            return "redirect:/admin/itBbsManage";
+        }
+
+        int result = itService.deleteItBbsCheck(bbsNoList);
+        ra.addFlashAttribute("message",
+            "총 " + result + "건의 IT뉴스 게시글이 일괄 삭제되었습니다.");
+        return "redirect:/admin/itBbsManage";
+    }
+
+    // ================================================================
+    // 📌 지식공유게시판 관리
+    // ================================================================
+    @GetMapping("/admin/post/knowledgeList")
+    public String knowledgeBbsManage(Model model) {
+        List<?> knowledgeList = knowledgeService.selectKnowledgeBbsList();
+        model.addAttribute("knowledgeList", knowledgeList);
+        return "admin/postManage/knowledgeBbsManage";
+    }
+
+    @GetMapping("/admin/deleteKnowledgeBbs")
+    public String deleteKnowledgeBbs(@RequestParam("knowledgeNo") int knowledgeNo, RedirectAttributes ra) {
+        int result = knowledgeService.deleteKnowledgeBbs(knowledgeNo);
+        ra.addFlashAttribute("message", result > 0
+            ? knowledgeNo + "번 지식공유 게시글이 삭제되었습니다."
+            : "삭제 중 오류가 발생했습니다.");
+        return "redirect:/admin/post/knowledgeList";
+    }
+
+    @PostMapping("/admin/deleteKnowledgeBbsCheck")
+    public String deleteKnowledgeBbsCheck(@RequestParam(value="bbsNoList", required=false) List<Integer> bbsNoList,
+                                          RedirectAttributes ra) {
+        if (bbsNoList == null || bbsNoList.isEmpty()) {
+            ra.addFlashAttribute("message", "선택된 게시글이 없습니다.");
+            return "redirect:/admin/post/knowledgeList";
+        }
+
+        int result = knowledgeService.deleteKnowledgeBbsCheck(bbsNoList);
+        ra.addFlashAttribute("message",
+            "총 " + result + "건의 지식공유 게시글이 일괄 삭제되었습니다.");
+        return "redirect:/admin/post/knowledgeList";
+    }
+
+    // ================================================================
+    // 📌 스터디모집게시판 관리
+    // ================================================================
+    @GetMapping("/admin/post/studyList")
+    public String studyBbsManage(Model model) {
+        List<?> studyList = studyService.selectStudyBbsList();
+        model.addAttribute("studyList", studyList);
+        return "admin/postManage/studyBbsManage";
+    }
+
+    @GetMapping("/admin/deleteStudyBbs")
+    public String deleteStudyBbs(@RequestParam("studyNo") int studyNo, RedirectAttributes ra) {
+        int result = studyService.deleteStudyBbs(studyNo);
+        ra.addFlashAttribute("message", result > 0
+            ? studyNo + "번 스터디모집 게시글이 삭제되었습니다."
+            : "삭제 중 오류가 발생했습니다.");
+        return "redirect:/admin/post/studyList";
+    }
+
+    @PostMapping("/admin/deleteStudyBbsCheck")
+    public String deleteStudyBbsCheck(@RequestParam(value="bbsNoList", required=false) List<Integer> bbsNoList,
+                                      RedirectAttributes ra) {
+        if (bbsNoList == null || bbsNoList.isEmpty()) {
+            ra.addFlashAttribute("message", "선택된 게시글이 없습니다.");
+            return "redirect:/admin/post/studyList";
+        }
+
+        int result = studyService.deleteStudyBbsCheck(bbsNoList);
+        ra.addFlashAttribute("message",
+            "총 " + result + "건의 스터디모집 게시글이 일괄 삭제되었습니다.");
+        return "redirect:/admin/post/studyList";
+    }
+
+    // ================================================================
+    // 📌 공지사항 관리
+    // ================================================================
+    @GetMapping("/admin/post/noticeList")
+    public String noticeBbsManage(Model model) {
+        List<?> noticeList = noticeService.selectNoticeBbsList();
+        model.addAttribute("noticeList", noticeList);
+        return "admin/postManage/noticeBbsManage";
+    }
+
+    @GetMapping("/admin/deleteNoticeBbs")
+    public String deleteNoticeBbs(@RequestParam("noticeNo") int noticeNo, RedirectAttributes ra) {
+        int result = noticeService.deleteNoticeBbs(noticeNo);
+        ra.addFlashAttribute("message", result > 0
+            ? noticeNo + "번 공지사항이 삭제되었습니다."
+            : "삭제 중 오류가 발생했습니다.");
+        return "redirect:/admin/post/noticeList";
+    }
+
+    @PostMapping("/admin/deleteNoticeBbsCheck")
+    public String deleteNoticeBbsCheck(@RequestParam(value="bbsNoList", required=false) List<Integer> bbsNoList,
+                                       RedirectAttributes ra) {
+        if (bbsNoList == null || bbsNoList.isEmpty()) {
+            ra.addFlashAttribute("message", "선택된 게시글이 없습니다.");
+            return "redirect:/admin/post/noticeList";
+        }
+
+        int result = noticeService.deleteNoticeBbsCheck(bbsNoList);
+        ra.addFlashAttribute("message",
+            "총 " + result + "건의 공지사항이 일괄 삭제되었습니다.");
+        return "redirect:/admin/post/noticeList";
+    }
+}

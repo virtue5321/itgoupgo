@@ -1,0 +1,59 @@
+package com.itgoupgo.community.admin.model.service;
+
+import java.util.List;
+
+import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.itgoupgo.community.admin.model.dao.AdminDao;
+import com.itgoupgo.community.common.model.vo.PageInfo;
+import com.itgoupgo.community.member.model.vo.Member;
+
+@Service
+public class AdminService {
+
+	@Autowired
+	private SqlSessionTemplate sqlSession;
+	
+	@Autowired
+	private AdminDao adminDao; 
+	
+    // 💡 [유지/페이징] 1. 전체 회원 수 조회 (페이징용)
+	public int selectListCount() {
+        return adminDao.selectListCount(sqlSession);
+    }
+	
+    // 💡 [유지/페이징] 2. 페이징 정보(PageInfo)를 받아 목록 조회 (기존 selectMemberList 대체)
+	public List<Member> selectMemberList(PageInfo pi) {
+		return adminDao.selectMemberList(sqlSession, pi);
+	}
+	
+    // 💡 [유지] 3. 단일 회원 탈퇴 요청에 대한 트랜잭션 처리
+	@Transactional
+	public int deleteMemberAdmin(String memberId) {
+		return adminDao.deleteMemberAdmin(sqlSession, memberId);
+	}
+	
+    // 💡 [유지] 4. 일괄 회원 탈퇴 트랜잭션 처리
+    @Transactional
+    public int deleteCheckMember(List<Integer> memberNoList) {
+        return adminDao.deleteCheckMember(sqlSession, memberNoList);
+    }
+	
+    // 💡 [유지] 5. 회원 이름으로 검색 트랜잭션 처리
+	public List<Member> searchMemberByName(String userName) {
+		return adminDao.searchMemberByName(sqlSession, userName);
+	}
+	
+    // 💡 [유지] 6. 회원 아이디로 검색 트랜잭션 처리
+	public Member searchMemberById(String memberId) {
+		return adminDao.searchMemberById(sqlSession, memberId);
+	}
+	
+    // 💡 [유지] 7. 회원 상세조회에 대한 트랜잭션 처리
+	public Member selectMemberDetail(int memberNo) {
+        return adminDao.selectMemberDetail(sqlSession, memberNo);
+    }
+}

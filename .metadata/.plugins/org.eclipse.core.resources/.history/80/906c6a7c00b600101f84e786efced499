@@ -1,0 +1,106 @@
+package com.itgoupgo.community.knowledge.model.vo;
+
+import java.sql.Date;
+
+public class KnowledgeBbs {
+
+	private int knowledgeNo; // KNOWLEDGE_NO	NUMBER
+	private String knowledgeTitle; // KNOWLEDGE_TITLE	VARCHAR2(100 BYTE)
+	private String knowledgeContent; // KNOWLEDGE_CONTENT	VARCHAR2(4000 BYTE)
+	private Date knowledgeCreateDate; // KNOWLEDGE_CREATE_DATE	DATE
+	private int knowledgeView; // KNOWLEDGE_VIEW	NUMBER
+	private String knowledgeCategory; // KNOWLEDGE_CATEGORY	VARCHAR2(100 BYTE)
+	private String knowledgeDeleteStatus; // KNOWLEDGE_DELETE_STATUS	CHAR(1 BYTE)
+	private int memberNo; // MEMBER_NO	NUMBER
+	private String memberNick;
+	
+	public KnowledgeBbs() {}
+	
+	public KnowledgeBbs(int knowledgeNo, String knowledgeTitle, String knowledgeContent, Date knowledgeCreateDate,
+			int knowledgeView, String knowledgeCategory, String knowledgeDeleteStatus, int memberNo
+			, String memberNick) {
+		super();
+		this.knowledgeNo = knowledgeNo;
+		this.knowledgeTitle = knowledgeTitle;
+		this.knowledgeContent = knowledgeContent;
+		this.knowledgeCreateDate = knowledgeCreateDate;
+		this.knowledgeView = knowledgeView;
+		this.knowledgeCategory = knowledgeCategory;
+		this.knowledgeDeleteStatus = knowledgeDeleteStatus;
+		this.memberNo = memberNo;
+		this.memberNick = memberNick;
+	}
+
+	public int getKnowledgeNo() {
+		return knowledgeNo;
+	}
+
+	public void setKnowledgeNo(int knowledgeNo) {
+		this.knowledgeNo = knowledgeNo;
+	}
+
+	public String getKnowledgeTitle() {
+		return knowledgeTitle;
+	}
+
+	public void setKnowledgeTitle(String knowledgeTitle) {
+		this.knowledgeTitle = knowledgeTitle;
+	}
+
+	public String getKnowledgeContent() {
+		return knowledgeContent;
+	}
+
+	public void setKnowledgeContent(String knowledgeContent) {
+		this.knowledgeContent = knowledgeContent;
+	}
+
+	public Date getKnowledgeCreateDate() {
+		return knowledgeCreateDate;
+	}
+
+	public void setKnowledgeCreateDate(Date knowledgeCreateDate) {
+		this.knowledgeCreateDate = knowledgeCreateDate;
+	}
+
+	public int getKnowledgeView() {
+		return knowledgeView;
+	}
+
+	public void setKnowledgeView(int knowledgeView) {
+		this.knowledgeView = knowledgeView;
+	}
+
+	public String getKnowledgeCategory() {
+		return knowledgeCategory;
+	}
+
+	public void setKnowledgeCategory(String knowledgeCategory) {
+		this.knowledgeCategory = knowledgeCategory;
+	}
+
+	public String getKnowledgeDeleteStatus() {
+		return knowledgeDeleteStatus;
+	}
+
+	public void setKnowledgeDeleteStatus(String knowledgeDeleteStatus) {
+		this.knowledgeDeleteStatus = knowledgeDeleteStatus;
+	}
+
+	public int getMemberNo() {
+		return memberNo;
+	}
+
+	public void setMemberNo(int memberNo) {
+		this.memberNo = memberNo;
+	}
+
+	@Override
+	public String toString() {
+		return "KnowledgeBbs [knowledgeNo=" + knowledgeNo + ", knowledgeTitle=" + knowledgeTitle + ", knowledgeContent="
+				+ knowledgeContent + ", knowledgeCreateDate=" + knowledgeCreateDate + ", knowledgeView=" + knowledgeView
+				+ ", knowledgeCategory=" + knowledgeCategory + ", knowledgeDeleteStatus=" + knowledgeDeleteStatus
+				+ ", memberNo=" + memberNo + "]";
+	}
+	
+}

@@ -1,0 +1,21 @@
+spring.application.name=itgoupgo-community
+
+# 서버 포트를 8008로 설정
+server.servlet.context-path=/community
+server.port=8008
+
+# View Resolver JSP 경로 설정 (prefix: 파일의 위치, suffix: 파일의 확장자)
+spring.mvc.view.prefix=/WEB-INF/views/
+spring.mvc.view.suffix=.jsp
+
+# 오라클 연동 구문
+spring.datasource.driver-class-name=oracle.jdbc.driver.OracleDriver
+spring.datasource.url=jdbc:oracle:thin:@localhost:1521:xe
+spring.datasource.username=ITGOUPGO
+spring.datasource.password=1234
+
+# MyBatis 설정 파일 경로 지정
+mybatis.config-location=classpath:mybatis-config.xml
+
+# Mapper 파일 경로 지정
+mybatis.mapper-locations=classpath:mappers/*.xml

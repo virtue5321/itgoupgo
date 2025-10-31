@@ -1,0 +1,187 @@
+package com.itgoupgo.community.admin.controller;
+
+import java.util.ArrayList;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import com.itgoupgo.community.admin.model.service.AdminService;
+import com.itgoupgo.community.common.model.vo.Pagination;
+import com.itgoupgo.community.member.model.vo.Member;
+
+import jakarta.servlet.http.HttpSession;
+
+@Controller
+@RequestMapping("/admin") 
+public class AdminController {
+	
+	@Autowired
+	private AdminService adminService;
+
+    @GetMapping({"", "/dashboard"})
+    public String adminDashboard() {
+        return "admin/admin"; 
+    }
+    
+    @GetMapping("/post")
+    public String postManage() {
+    	
+    	return "admin/postManage";
+    }
+    
+    @GetMapping("/reply")
+    public String replyManage() {
+        return "admin/replyManage";
+    }
+
+    @GetMapping("/stats")
+    public String statsPage() {
+        return "admin/stats";
+    }
+
+    @GetMapping("/logout")
+    public String logout() {
+        return "admin/logout"; // 실제 로그아웃 로직은 생략
+    }
+
+    /**
+     * 회원 목록 조회 페이지 (페이징 적용)
+     * @param currentPage 현재 페이지 번호 (기본값 1)
+     */
+    @GetMapping("/member")
+    public String memberManage(
+        // 쿼리스트링으로 currentPage를 받음. 값이 없으면 기본값 1
+        @RequestParam(value = "currentPage", defaultValue = "1") int currentPage, 
+        Model model) {
+        
+        // 1. 전체 회원 수 조회 (listCount)
+        int listCount = adminService.selectListCount(); 
+        
+        // 2. Pagination 객체 생성 (pageLimit, listLimit은 Service에서 처리한다고 가정)
+        Pagination pageInfo = adminService.getPagination(currentPage, listCount); // 
+        
+        // 3. 현재 페이지에 해당하는 회원 목록 조회
+        List<Member> memberList = adminService.selectMemberList(pageInfo);
+        
+        // 4. 모델에 목록과 페이징 정보를 담아 전달
+        model.addAttribute("memberList", memberList);
+        model.addAttribute("pageInfo", pageInfo);
+        
+        return "admin/memberManage";
+    }
+    
+    // ----------------------------------------------------
+    // 🟢 3. 관리자페이지 회원 상세 조회 기능 추가
+    // ----------------------------------------------------
+    @GetMapping("/memberDetail")
+    public String memberDetail(
+        @RequestParam("memberNo") int memberNo, // memberNo를 쿼리스트링으로 받음
+        Model model,
+        HttpSession session) {
+        
+        Member member = adminService.selectMemberDetail(memberNo);
+        
+        if (member == null) {
+            // 상세 조회에 실패했을 경우 (예: 잘못된 memberNo)
+            session.setAttribute("alertMsg", "해당 회원 정보가 존재하지 않습니다.");
+            return "redirect:/admin/member";
+        }
+        
+        model.addAttribute("member", member);
+        
+        // 뷰 리졸버 설정(application.properties)에 따라
+        // /WEB-INF/views/admin/memberDetail.jsp 파일을 찾게 됨
+        return "admin/memberDetail"; 
+    }
+    
+    // ----------------------------------------------------
+    // 🟢 4. 회원 단일 탈퇴 처리
+    // ----------------------------------------------------
+    @GetMapping("/delete")
+    public String deleteMember(@RequestParam("memberId") String memberId, HttpSession session) {
+        
+        int result = adminService.deleteMemberAdmin(memberId);
+        
+        if (result > 0) {
+            session.setAttribute("alertMsg", "회원 (" + memberId + ") 탈퇴 처리가 완료되었습니다.");
+        } else {
+            session.setAttribute("alertMsg", "회원 탈퇴 처리 중 오류가 발생했습니다.");
+        }
+
+        return "redirect:/admin/member";
+    }
+    
+    // ----------------------------------------------------
+    // 🟢 5. 회원 일괄 탈퇴 처리
+    // ----------------------------------------------------
+    @PostMapping("/deleteCheckMember")
+    public String deleteCheckMember(
+        @RequestParam(value = "memberNoList", required = false) List<Integer> memberNoList,
+        HttpSession session) {
+
+        if (memberNoList == null || memberNoList.isEmpty()) {
+             session.setAttribute("alertMsg", "선택된 회원이 없습니다.");
+             return "redirect:/admin/member";
+        }
+        
+        int result = adminService.deleteCheckMember(memberNoList);
+
+        if (result == memberNoList.size()) {
+            session.setAttribute("alertMsg", result + "명의 회원이 성공적으로 일괄 탈퇴 처리되었습니다.");
+        } else {
+            session.setAttribute("alertMsg", "일괄 탈퇴 처리 중 일부 오류가 발생했습니다. (" + result + "명 처리됨)");
+        }
+
+        return "redirect:/admin/member";
+    }
+    
+    // ----------------------------------------------------
+    // 🟢 6. 회원 검색 (이름)
+    // ----------------------------------------------------
+    @GetMapping("/searchMemberName")
+    public String searchMemberName(
+        @RequestParam("keyword") String memberName, 
+        Model model) {
+    	
+        List<Member> searchList = adminService.searchMemberByName(memberName);
+        
+        model.addAttribute("memberList", searchList);
+        model.addAttribute("searchCondition", "searchMemberName");
+        model.addAttribute("searchKeyword", memberName);
+    	
+    	return "admin/memberManage";
+    }
+    
+    // ----------------------------------------------------
+    // 🟢 7. 회원 검색 (아이디)
+    // ----------------------------------------------------
+    @GetMapping("/searchMemberId")
+    public String searchMemberId(
+        @RequestParam("keyword") String memberId,
+        Model model) {
+    	
+        Member m = adminService.searchMemberById(memberId);
+        
+        // JSP 호환을 위해 List로 감싸기
+        List<Member> searchList = new ArrayList<>();
+        if (m != null) {
+            searchList.add(m);
+        }
+        
+        model.addAttribute("memberList", searchList);
+        model.addAttribute("searchCondition", "searchMemberId");
+        model.addAttribute("searchKeyword", memberId);
+
+        return "admin/memberManage";
+    }
+    
+ 
+
+}

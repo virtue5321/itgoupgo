@@ -1,0 +1,95 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>댓글 관리</title>
+  <link rel="stylesheet" href="<c:url value="/resources/css/adminStyle.css" />">
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="<c:url value="/resources/images/logo.png" />" width="80">
+      관리자 페이지
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <ul>
+        <li><a href="<c:url value="/admin/dashboard" />">🏠 대시보드</a></li>
+        <li><a href="<c:url value="/admin/member" />">👥 회원 관리</a></li>
+        <li><a href="<c:url value="/admin/post" />">📝 게시글 관리</a></li>
+        <li><a href="<c:url value="/admin/reply" />" class="active">💬 댓글 관리</a></li>
+        <li><a href="<c:url value="/admin/stats" />">📊 통계</a></li>
+        <li><a href="<c:url value="/admin/logout" />">🚪 로그아웃</a></li>
+      </ul>
+    </aside>
+
+    <main>
+      <h1>💬 댓글 관리</h1>
+      <p>게시글에 등록된 댓글을 관리할 수 있습니다.</p>
+
+      <div style="display:flex; justify-content:flex-end; align-items:center; margin-bottom:10px;">
+        <button style="background:#dc3545; color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer;">
+          선택 항목 일괄 삭제
+        </button>
+      </div>
+
+      <table border="1" cellpadding="10" cellspacing="0" style="width:100%; background:white; border-collapse:collapse; text-align:center;">
+        <tr style="background:#f3f4f6;">
+          <th><input type="checkbox" id="selectAllCheckboxComment"></th> 
+          <th>댓글번호</th><th>내용</th><th>원본 게시글</th><th>작성자</th><th>작성일</th><th>관리</th>
+        </tr>
+        <tr><td><input type="checkbox" class="itemCheckboxComment"></td><td>1</td><td style="text-align:left;">좋은 글 감사합니다!</td><td><a href="<c:url value="/postDetail?id=1" />" style="color:#5a5ce8; text-decoration:none;">사이트 오픈 공지</a></td><td>user123</td><td>2025-03-02</td><td><button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">삭제</button></td></tr>
+        <tr><td><input type="checkbox" class="itemCheckboxComment"></td><td>2</td><td style="text-align:left;">유용한 정보네</td><td><a href="<c:url value="/postDetail?id=2" />" style="color:#5a5ce8; text-decoration:none;">업데이트 안내</a></td><td>guest01</td><td>2025-03-05</td><td><button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">삭제</button></td></tr>
+        <tr><td><input type="checkbox" class="itemCheckboxComment"></td><td>3</td><td style="text-align:left;">맞아요 저도 동의합니다.</td><td><a href="<c:url value="/postDetail?id=3" />" style="color:#5a5ce8; text-decoration:none;">자유롭게 질문드립니다.</a></td><td>user99</td><td>2025-03-07</td><td><button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">삭제</button></td></tr>
+        <tr><td><input type="checkbox" class="itemCheckboxComment"></td><td>4</td><td style="text-align:left;">자세한 설명 감사합니다.</td><td><a href="<c:url value="/postDetail?id=4" />" style="color:#5a5ce8; text-decoration:none;">새로운 기능 사용 팁</a></td><td>newbie</td><td>2025-03-09</td><td><button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">삭제</button></td></tr>
+        <tr><td><input type="checkbox" class="itemCheckboxComment"></td><td>5</td><td style="text-align:left;">저도 궁금했는데 해소됐어요.</td><td><a href="<c:url value="/postDetail?id=5" />" style="color:#5a5ce8; text-decoration:none;">오늘의 고민 상담</a></td><td>helper</td><td>2025-03-11</td><td><button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">삭제</button></td></tr>
+        <tr><td><input type="checkbox" class="itemCheckboxComment"></td><td>6</td><td style="text-align:left;">꿀팁이네요 저장합니다!</td><td><a href="<c:url value="/postDetail?id=6" />" style="color:#5a5ce8; text-decoration:none;">주식 투자 기초</a></td><td>saver</td><td>2025-03-14</td><td><button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">삭제</button></td></tr>
+        <tr><td><input type="checkbox" class="itemCheckboxComment"></td><td>7</td><td style="text-align:left;">저도 참여하고 싶어요.</td><td><a href="<c:url value="/postDetail?id=7" />" style="color:#5a5ce8; text-decoration:none;">점심 메뉴 추천 받습니다</a></td><td>joiner</td><td>2025-03-16</td><td><button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">삭제</button></td></tr>
+        <tr><td><input type="checkbox" class="itemCheckboxComment"></td><td>8</td><td style="text-align:left;">시간 관리 어렵죠.</td><td><a href="<c:url value="/postDetail?id=8" />" style="color:#5a5ce8; text-decoration:none;">효율적인 시간 관리법</a></td><td>busybee</td><td>2025-03-20</td><td><button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">삭제</button></td></tr>
+        <tr><td><input type="checkbox" class="itemCheckboxComment"></td><td>9</td><td style="text-align:left;">재밌는 이야기 감사합니다.</td><td><a href="<c:url value="/postDetail?id=9" />" style="color:#5a5ce8; text-decoration:none;">주말에 뭐 하시나요?</a></td><td>happy_user</td><td>2025-03-22</td><td><button style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">삭제</button></td></tr>
+      </table>
+
+      <div style="margin-top:20px; text-align:center;">
+        <a href="#" style="text-decoration:none; padding:5px 10px; border:1px solid #ccc; border-radius:3px; margin:0 2px;">&lt;</a>
+        <a href="#" style="text-decoration:none; padding:5px 10px; border:1px solid #ccc; border-radius:3px; margin:0 2px; background:#5a5ce8; color:white;">1</a>
+        <a href="#" style="text-decoration:none; padding:5px 10px; border:1px solid #ccc; border-radius:3px; margin:0 2px;">2</a>
+        <a href="#" style="text-decoration:none; padding:5px 10px; border:1px solid #ccc; border-radius:3px; margin:0 2px;">3</a>
+        <a href="#" style="text-decoration:none; padding:5px 10px; border:1px solid #ccc; border-radius:3px; margin:0 2px;">4</a>
+        <a href="#" style="text-decoration:none; padding:5px 10px; border:1px solid #ccc; border-radius:3px; margin:0 2px;">5</a>
+        <a href="#" style="text-decoration:none; padding:5px 10px; border:1px solid #ccc; border-radius:3px; margin:0 2px;">&gt;</a>
+      </div>
+    </main>
+  </div>
+
+  <footer>ⓒ 2025 IT GO UP GO. All Rights Reserved.</footer>
+
+<script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const selectAllCheckbox = document.getElementById('selectAllCheckboxComment');
+        const itemCheckboxes = document.querySelectorAll('.itemCheckboxComment');
+        
+        // 1. 전체 선택/해제 기능
+        selectAllCheckbox.addEventListener('change', function() {
+            itemCheckboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+        });
+
+        // 2. 개별 체크박스 상태 변경 시 전체 선택 체크박스 상태 업데이트
+        itemCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                if (!checkbox.checked) {
+                    selectAllCheckbox.checked = false;
+                } else if (document.querySelectorAll('.itemCheckboxComment:checked').length === itemCheckboxes.length) {
+                    selectAllCheckbox.checked = true;
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

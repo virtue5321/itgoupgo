@@ -1,0 +1,458 @@
+package com.itgoupgo.community.admin.controller;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.itgoupgo.community.admin.model.service.AdminService;
+import com.itgoupgo.community.common.model.vo.Pagination;
+import com.itgoupgo.community.free.model.service.FreeService;
+import com.itgoupgo.community.free.model.vo.FreeBbs; // 자유게시판 VO
+import com.itgoupgo.community.info.model.service.InfoService;
+import com.itgoupgo.community.info.model.vo.InfoBbs; // 정보공유게시판 VO
+import com.itgoupgo.community.it.model.service.ItService;
+import com.itgoupgo.community.it.model.vo.ItBbs; // IT뉴스 VO
+import com.itgoupgo.community.knowledge.model.service.KnowledgeService;
+import com.itgoupgo.community.knowledge.model.vo.KnowledgeBbs; // 지식공유게시판 VO
+import com.itgoupgo.community.member.model.vo.Member;
+import com.itgoupgo.community.notice.model.service.NoticeService;
+import com.itgoupgo.community.notice.model.vo.NoticeBbs; // 공지사항 VO
+import com.itgoupgo.community.study.model.service.StudyService;
+import com.itgoupgo.community.study.model.vo.StudyBbs; // 스터디모집게시판 VO
+
+import jakarta.servlet.http.HttpSession;
+
+@Controller
+@RequestMapping("/admin") 
+public class AdminController {
+	
+	@Autowired
+	private AdminService adminService;
+    
+    @Autowired
+    private FreeService freeService;
+
+    @Autowired
+    private InfoService infoService;
+    
+    @Autowired
+    private StudyService studyService;
+    
+    @Autowired
+    private NoticeService noticeService;
+    
+    @Autowired
+    private KnowledgeService knowledgeService;
+    
+    @Autowired
+    private ItService itService;
+    
+    @GetMapping({"", "/dashboard"})
+    public String adminDashboard() {
+        return "admin/admin"; 
+    }
+    
+    // 게시글 관리 메인 페이지 (기존 유지)
+    @GetMapping("/post")
+    public String postManage() {
+    	
+    	return "admin/postManage";
+    }
+    
+    @GetMapping("/reply")
+    public String replyManage() {
+        return "admin/replyManage";
+    }
+
+    @GetMapping("/stats")
+    public String statsPage() {
+        return "admin/stats";
+    }
+
+    @GetMapping("/logout")
+    public String logout() {
+        return "admin/logout"; // 실제 로그아웃 로직은 생략
+    }
+
+    /**
+     * 회원 목록 조회 페이지 (페이징 적용) - (기존 유지)
+     */
+    @GetMapping("/member")
+    public String memberManage(
+        @RequestParam(value = "currentPage", defaultValue = "1") int currentPage, 
+        Model model) {
+        
+        // 1. 전체 회원 수 조회 (listCount)
+        int listCount = adminService.selectListCount(); 
+        
+        // 2. Pagination 객체 생성 (pageLimit, listLimit은 Service에서 처리한다고 가정)
+        Pagination pageInfo = adminService.getPagination(currentPage, listCount); // 
+        
+        // 3. 현재 페이지에 해당하는 회원 목록 조회
+        List<Member> memberList = adminService.selectMemberList(pageInfo);
+        
+        // 4. 모델에 목록과 페이징 정보를 담아 전달
+        model.addAttribute("memberList", memberList);
+        model.addAttribute("pageInfo", pageInfo);
+        
+        return "admin/memberManage";
+    }
+    
+    // ----------------------------------------------------
+    // 3. 관리자페이지 회원 상세 조회 기능 (기존 유지)
+    // ----------------------------------------------------
+    @GetMapping("/memberDetail")
+    public String memberDetail(
+        @RequestParam("memberNo") int memberNo, // memberNo를 쿼리스트링으로 받음
+        Model model,
+        HttpSession session) {
+        
+        Member member = adminService.selectMemberDetail(memberNo);
+        
+        if (member == null) {
+            // 상세 조회에 실패했을 경우 (예: 잘못된 memberNo)
+            session.setAttribute("alertMsg", "해당 회원 정보가 존재하지 않습니다.");
+            return "redirect:/admin/member";
+        }
+        
+        model.addAttribute("member", member);
+        
+        // 뷰 리졸버 설정(application.properties)에 따라
+        // /WEB-INF/views/admin/memberDetail.jsp 파일을 찾게 됨
+        return "admin/memberDetail"; 
+    }
+    
+    // ----------------------------------------------------
+    // 4. 회원 단일 탈퇴 처리 (기존 유지)
+    // ----------------------------------------------------
+    @GetMapping("/delete")
+    public String deleteMember(@RequestParam("memberId") String memberId, HttpSession session) {
+        
+        int result = adminService.deleteMemberAdmin(memberId);
+        
+        if (result > 0) {
+            session.setAttribute("alertMsg", "회원 (" + memberId + ") 탈퇴 처리가 완료되었습니다.");
+        } else {
+            session.setAttribute("alertMsg", "회원 탈퇴 처리 중 오류가 발생했습니다.");
+        }
+
+        return "redirect:/admin/member";
+    }
+    
+    // ----------------------------------------------------
+    // 5. 회원 일괄 탈퇴 처리 (기존 유지)
+    // ----------------------------------------------------
+    @PostMapping("/deleteCheckMember")
+    public String deleteCheckMember(
+        @RequestParam(value = "memberNoList", required = false) List<Integer> memberNoList,
+        HttpSession session) {
+
+        if (memberNoList == null || memberNoList.isEmpty()) {
+             session.setAttribute("alertMsg", "선택된 회원이 없습니다.");
+             return "redirect:/admin/member";
+        }
+        
+        int result = adminService.deleteCheckMember(memberNoList);
+
+        if (result == memberNoList.size()) {
+            session.setAttribute("alertMsg", result + "명의 회원이 성공적으로 일괄 탈퇴 처리되었습니다.");
+        } else {
+            session.setAttribute("alertMsg", "일괄 탈퇴 처리 중 일부 오류가 발생했습니다. (" + result + "명 처리됨)");
+        }
+
+        return "redirect:/admin/member";
+    }
+    
+    // ----------------------------------------------------
+    // 6. 회원 검색 (이름) (기존 유지)
+    // ----------------------------------------------------
+    @GetMapping("/searchMemberName")
+    public String searchMemberName(
+        @RequestParam("keyword") String memberName, 
+        Model model) {
+    	
+        List<Member> searchList = adminService.searchMemberByName(memberName);
+        
+        model.addAttribute("memberList", searchList);
+        model.addAttribute("searchCondition", "searchMemberName");
+        model.addAttribute("searchKeyword", memberName);
+    	
+    	return "admin/memberManage";
+    }
+    
+    // ----------------------------------------------------
+    // 7. 회원 검색 (아이디) (기존 유지)
+    // ----------------------------------------------------
+    @GetMapping("/searchMemberId")
+    public String searchMemberId(
+        @RequestParam("keyword") String memberId,
+        Model model) {
+    	
+        Member m = adminService.searchMemberById(memberId);
+        
+        // JSP 호환을 위해 List로 감싸기
+        List<Member> searchList = new ArrayList<>();
+        if (m != null) {
+            searchList.add(m);
+        }
+        
+        model.addAttribute("memberList", searchList);
+        model.addAttribute("searchCondition", "searchMemberId");
+        model.addAttribute("searchKeyword", memberId);
+
+        return "admin/memberManage";
+    }
+    
+    // ****************************************************
+    // 🟢 게시판별 게시글 목록 조회 기능
+    // ****************************************************
+    
+    /**
+     * 자유 게시판 관리 페이지로 이동 & 게시글 목록 조회 (통합)
+     */
+
+    @GetMapping("/freeBbsManage")
+    public String freeBbsManage(
+        @RequestParam(value = "currentPage", defaultValue = "1") int currentPage,
+        Model model) {
+        
+        // 1. listCount를 FreeService를 통해 조회
+        int listCount = freeService.selectListCount(); 
+        
+        // 2. Pagination 객체 생성 (AdminService의 공통 유틸리티 사용)
+        Pagination pageInfo = adminService.getPagination(currentPage, listCount);
+        
+        // 3. 현재 페이지 목록을 FreeService를 통해 조회
+        List<FreeBbs> freeBbsList = freeService.selectList(currentPage); // 💡 변수명도 freeBbsList로 변경하는 것을 권장
+        
+        // 4. 모델에 데이터 추가
+        // 💡 수정: "bbsList"를 "freeBbsList"로 변경하여 JSP와 일치시킴
+        model.addAttribute("freeBbsList", freeBbsList); 
+        model.addAttribute("pageInfo", pageInfo);
+        model.addAttribute("boardName", "자유 게시판");
+        model.addAttribute("boardCode", "free");
+        
+        // 5. JSP 리턴
+        return "admin/freeBbsManage"; 
+    }
+    
+	 // 1. 단일 게시글 삭제 (GET 요청 처리)
+	 // URL: /admin/deleteFreeBbsPost -> /admin/deleteFreeBbs
+	 @GetMapping("/deleteFreeBbs")
+	 public String deleteFreeBbs(@RequestParam("bbsNo") int bbsNo, RedirectAttributes ra) {
+	     int result = freeService.deleteFreeBbs(bbsNo); // 메소드명 변경
+	     
+	     if (result > 0) {
+	         ra.addFlashAttribute("message", bbsNo + "번 게시글이 성공적으로 삭제(비활성화) 처리되었습니다.");
+	     } else {
+	         ra.addFlashAttribute("message", "게시글 삭제 처리에 실패했습니다.");
+	     }
+	     
+	     return "redirect:/admin/freeBbsManage"; 
+	 }
+	
+	 // 2. 일괄 삭제 (POST 요청 처리)
+	 // URL: /admin/deleteFreeBbsCheckPost -> /admin/deleteFreeBbsCheck
+	 @PostMapping("/deleteFreeBbsCheck")
+	 public String deleteFreeBbsCheck(@RequestParam(value="bbsNoList", required=false) List<Integer> bbsNoList, RedirectAttributes ra) {
+	     
+	     if (bbsNoList == null || bbsNoList.isEmpty()) {
+	         ra.addFlashAttribute("message", "선택된 게시글이 없습니다.");
+	         return "redirect:/admin/freeBbsManage";
+	     }
+	
+	     int result = freeService.deleteFreeBbsCheck(bbsNoList); // 메소드명 변경
+	     
+	     if (result == bbsNoList.size()) {
+	         ra.addFlashAttribute("message", "총 " + result + "건의 게시글이 성공적으로 일괄 삭제(비활성화) 처리되었습니다.");
+	     } else {
+	         ra.addFlashAttribute("message", "일괄 삭제 처리가 완료되었으나, 요청된 개수(" + bbsNoList.size() + "건) 중 " + result + "건만 처리되었습니다.");
+	     }
+	     
+	     return "redirect:/admin/freeBbsManage";
+	 }
+    
+    
+	 /**
+	     * 정보 공유 게시판 관리 페이지로 이동 & 게시글 목록 조회 (통합)
+	     */
+	    @GetMapping("/infoBbsManage")
+	    public String infoBbsManage(
+	        @RequestParam(value = "currentPage", defaultValue = "1") int currentPage,
+	        Model model) {
+	        
+	        // 1. listCount를 InfoService를 통해 조회
+	        int listCount = infoService.selectListCount(); 
+	        
+	        // 2. Pagination 객체 생성 (AdminService의 공통 유틸리티 사용)
+	        Pagination pageInfo = adminService.getPagination(currentPage, listCount);
+	        
+	        // 3. 현재 페이지 목록을 InfoService를 통해 조회
+	        List<InfoBbs> infoBbsList = infoService.selectList(currentPage);
+	        
+	        // 4. 모델에 데이터 추가
+	        model.addAttribute("infoBbsList", infoBbsList); 
+	        model.addAttribute("pageInfo", pageInfo);
+	        model.addAttribute("boardName", "정보 공유 게시판");
+	        model.addAttribute("boardCode", "info");
+	        
+	        // 5. JSP 리턴
+	        return "admin/infoBbsManage"; 
+	    }
+	    
+		 // 1. 단일 게시글 삭제 (GET 요청 처리)
+		 // 💡 [수정] URL: /admin/deleteInfoBbsPost -> /admin/deleteInfoBbs
+		 @GetMapping("/deleteInfoBbs")
+		 public String deleteInfoBbs(@RequestParam("infoNo") int infoNo, RedirectAttributes ra) {
+		     // InfoService의 메소드 호출
+		     int result = infoService.deleteInfoBbs(infoNo); 
+		     
+		     if (result > 0) {
+		         ra.addFlashAttribute("message", infoNo + "번 게시글이 성공적으로 삭제(비활성화) 처리되었습니다.");
+		     } else {
+		         ra.addFlashAttribute("message", "게시글 삭제 처리에 실패했습니다.");
+		     }
+		     
+		     return "redirect:/admin/infoBbsManage"; 
+		 }
+		
+		 // 2. 일괄 삭제 (POST 요청 처리)
+		 // 💡 [수정] URL: /admin/deleteInfoBbsCheckPost -> /admin/deleteInfoBbsCheck
+		 @PostMapping("/deleteInfoBbsCheck")
+		 public String deleteInfoBbsCheck(@RequestParam(value="bbsNoList", required=false) List<Integer> bbsNoList, RedirectAttributes ra) {
+		     
+		     if (bbsNoList == null || bbsNoList.isEmpty()) {
+		         ra.addFlashAttribute("message", "선택된 게시글이 없습니다.");
+		         return "redirect:/admin/infoBbsManage";
+		     }
+		
+		     // InfoService의 일괄 삭제 메소드 호출
+		     int result = infoService.deleteInfoBbsCheck(bbsNoList); 
+		     
+		     if (result == bbsNoList.size()) {
+		         ra.addFlashAttribute("message", "총 " + result + "건의 게시글이 성공적으로 일괄 삭제(비활성화) 처리되었습니다.");
+		     } else {
+		         ra.addFlashAttribute("message", "일괄 삭제 처리가 완료되었으나, 요청된 개수(" + bbsNoList.size() + "건) 중 " + result + "건만 처리되었습니다.");
+		     }
+		     
+		     return "redirect:/admin/infoBbsManage";
+		 }
+    
+		 /**
+	     * 6. IT뉴스 게시글 목록 조회
+	     * [수정됨] ItService를 사용하여 목록 데이터를 가져옵니다.
+	     */
+	    @GetMapping("/itBbsManage")
+	    public String itList(
+	        @RequestParam(value = "currentPage", defaultValue = "1") int currentPage,
+	        Model model) {
+	        
+	        // [수정됨] ItService를 통해 전체 글 수 조회
+	        int listCount = itService.selectListCount(); 
+	        
+	        // 2. Pagination 객체 생성 (AdminService의 공통 유틸리티 사용)
+	        Pagination pageInfo = adminService.getPagination(currentPage, listCount);
+	        
+	        // [수정됨] ItService를 통해 현재 페이지 목록 조회
+	        List<ItBbs> bbsList = itService.selectList(currentPage);
+	        
+	        model.addAttribute("bbsList", bbsList);
+	        model.addAttribute("pageInfo", pageInfo);
+	        model.addAttribute("boardName", "IT뉴스");
+	        model.addAttribute("boardCode", "it");
+	        
+	        return "admin/itBbsManage";
+	    }
+		 
+		 
+		 
+		 
+    /**
+     * 3. 지식공유게시판 게시글 목록 조회 (/admin/post/knowledgeList)
+     * [수정됨] KnowledgeService를 사용하여 목록 데이터를 가져옵니다.
+     */
+    @GetMapping("/post/knowledgeList")
+    public String knowledgeList(
+        @RequestParam(value = "currentPage", defaultValue = "1") int currentPage,
+        Model model) {
+        
+        // [수정됨] KnowledgeService를 통해 전체 글 수 조회
+        int listCount = knowledgeService.selectListCount(); 
+        
+        // 2. Pagination 객체 생성 (AdminService의 공통 유틸리티 사용)
+        Pagination pageInfo = adminService.getPagination(currentPage, listCount);
+        
+        // [수정됨] KnowledgeService를 통해 현재 페이지 목록 조회
+        List<KnowledgeBbs> bbsList = knowledgeService.selectList(currentPage);
+        
+        model.addAttribute("bbsList", bbsList);
+        model.addAttribute("pageInfo", pageInfo);
+        model.addAttribute("boardName", "지식공유게시판");
+        model.addAttribute("boardCode", "knowledge");
+        
+        return "admin/postListManage";
+    }
+    
+    /**
+     * 4. 스터디모집게시판 게시글 목록 조회 (/admin/post/studyList)
+     * [수정됨] StudyService를 사용하여 목록 데이터를 가져옵니다.
+     */
+    @GetMapping("/post/studyList")
+    public String studyList(
+        @RequestParam(value = "currentPage", defaultValue = "1") int currentPage,
+        Model model) {
+        
+        // [수정됨] StudyService를 통해 전체 글 수 조회
+        int listCount = studyService.selectListCount(); 
+        
+        // 2. Pagination 객체 생성 (AdminService의 공통 유틸리티 사용)
+        Pagination pageInfo = adminService.getPagination(currentPage, listCount);
+        
+        // [수정됨] StudyService를 통해 현재 페이지 목록 조회
+        List<StudyBbs> bbsList = studyService.selectList(currentPage);
+        
+        model.addAttribute("bbsList", bbsList);
+        model.addAttribute("pageInfo", pageInfo);
+        model.addAttribute("boardName", "스터디모집게시판");
+        model.addAttribute("boardCode", "study");
+        
+        return "admin/postListManage";
+    }
+
+    /**
+     * 5. 공지사항 게시글 목록 조회 (/admin/post/noticeList)
+     * [수정됨] NoticeService를 사용하여 목록 데이터를 가져옵니다.
+     */
+    @GetMapping("/post/noticeList")
+    public String noticeList(
+        @RequestParam(value = "currentPage", defaultValue = "1") int currentPage,
+        Model model) {
+        
+        // [수정됨] NoticeService를 통해 전체 글 수 조회
+        int listCount = noticeService.selectListCount(); 
+        
+        // 2. Pagination 객체 생성 (AdminService의 공통 유틸리티 사용)
+        Pagination pageInfo = adminService.getPagination(currentPage, listCount);
+        
+        // [수정됨] NoticeService를 통해 현재 페이지 목록 조회
+        List<NoticeBbs> bbsList = noticeService.selectList(currentPage);
+        
+        model.addAttribute("bbsList", bbsList);
+        model.addAttribute("pageInfo", pageInfo);
+        model.addAttribute("boardName", "공지사항");
+        model.addAttribute("boardCode", "notice");
+        
+        return "admin/postListManage";
+    }
+
+   
+
+}

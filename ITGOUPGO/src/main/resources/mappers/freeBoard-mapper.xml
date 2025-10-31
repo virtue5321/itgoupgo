@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="freeBoardMapper">
+
+    <resultMap id="freeBoardResultSet" type="freeBoard">
+        <id column="FREE_NO" property="freeNo"/>
+        <result column="MEMBER_NO" property="memberNo"/>
+        <result column="FREE_TITLE" property="freeTitle"/>
+        <result column="FREE_CREATE_DATE" property="freeCreateDate"/>
+        <result column="FREE_VIEW" property="freeView"/>
+        <result column="MEMBER_ID" property="writerId"/>
+        <result column="CATEGORY_NAME" property="categoryName"/>
+    </resultMap>
+
+	<!-- 1. 전체 게시글 개수 조회 (getListCount) -->
+    <select id="getListCount" resultType="_int">
+        SELECT COUNT(*)
+        FROM FREE_BBS
+        WHERE FREE_DELETE_STATUS = 'N'
+    </select>
+
+    <!-- 2. 게시글 목록 조회 (selectFreeBoardList) -->
+    <select id="selectFreeBoardList" resultMap="freeBoardResultSet">
+        SELECT *
+        FROM (
+            SELECT ROWNUM RNUM, A.*
+            FROM (
+                SELECT 
+                    FREE_NO, 
+                    B.MEMBER_NO, 
+                    FREE_TITLE, 
+                    FREE_CREATE_DATE, 
+                    FREE_VIEW,
+                    M.MEMBER_ID  -- 작성자 ID를 조회하여 목록에 표시
+                FROM FREE_BBS B
+                JOIN MEMBER M ON (B.MEMBER_NO = M.MEMBER_NO)
+                WHERE FREE_DELETE_STATUS = 'N'
+                ORDER BY FREE_NO DESC
+            ) A
+        )
+        WHERE RNUM BETWEEN #{startRow} AND #{endRow}
+    </select>
+
+    <!-- 3. 게시글 검색된 개수 by 제목/내용/작성자 -->
+    <select id="getSearchCount" resultType="_int" parameterType="hashmap">
+        SELECT COUNT(*)
+        FROM FREE_BBS B
+        JOIN MEMBER M ON (B.MEMBER_NO = M.MEMBER_NO)
+        WHERE FREE_DELETE_STATUS = 'N'
+        <if test="condition == 'title'">
+            AND FREE_TITLE LIKE '%' || #{keyword} || '%'
+        </if>
+        <if test="condition == 'content'">
+            AND FREE_CONTENT LIKE '%' || #{keyword} || '%'
+        </if>
+        <if test="condition == 'writer'">
+            AND MEMBER_ID LIKE '%' || #{keyword} || '%'
+        </if>
+    </select>
+
+    <!-- 4. 게시글 검색 여러행 조회 -->
+     <select id="selectSearchList" resultMap="freeBoardResultSet" parameterType="hashmap">
+        SELECT *
+        FROM (
+            SELECT ROWNUM RNUM, A.*
+            FROM (
+                SELECT
+                    FREE_NO,
+                    B.MEMBER_NO,
+                    FREE_TITLE,
+                    FREE_CREATE_DATE,
+                    FREE_VIEW,
+                    M.MEMBER_ID
+                FROM FREE_BBS B
+                JOIN MEMBER M ON (B.MEMBER_NO = M.MEMBER_NO)
+                WHERE FREE_DELETE_STATUS = 'N'
+                <if test="condition == 'title'">
+                    AND FREE_TITLE LIKE '%' || #{keyword} || '%'
+                </if>
+                <if test="condition == 'content'">
+                    AND FREE_CONTENT LIKE '%' || #{keyword} || '%'
+                </if>
+                <if test="condition == 'writer'">
+                    AND MEMBER_ID LIKE '%' || #{keyword} || '%'
+                </if>
+                ORDER BY FREE_NO DESC
+            ) A
+        )
+        WHERE RNUM BETWEEN #{startRow} AND #{endRow}
+     </select>
+</mapper>

@@ -1,0 +1,55 @@
+package com.itgoupgo.community.admin.model.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.session.RowBounds;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.stereotype.Repository;
+
+import com.itgoupgo.community.common.model.vo.PageInfo;
+import com.itgoupgo.community.member.model.vo.Member;
+
+@Repository
+public class AdminDao {
+	
+    // 💡 [유지/페이징] 1. 전체 회원 수 조회 (페이징용)
+    public int selectListCount(SqlSessionTemplate sqlSession) {
+        return sqlSession.selectOne("adminMapper.selectListCount");
+    }
+    
+    // 💡 [유지/페이징] 2. 페이징 처리된 회원 목록 조회 (RowBounds 사용)
+ 	public List<Member> selectMemberList(SqlSessionTemplate sqlSession, PageInfo pi) {
+ 		
+         int limit = pi.getBoardLimit(); // 한 페이지에 보여줄 회원 수
+         int offset = (pi.getCurrentPage() - 1) * limit; // 건너뛸 회원 수
+         
+         RowBounds rowBounds = new RowBounds(offset, limit);
+         
+ 		return sqlSession.selectList("adminMapper.selectMemberList", null, rowBounds);
+ 	}
+	
+    // 💡 [유지] 3. 단일 회원 탈퇴 (MEMBER_STATUS 'N'으로 업데이트)
+	public int deleteMemberAdmin(SqlSessionTemplate sqlSession, String memberId) {
+		return sqlSession.update("adminMapper.deleteMemberAdmin", memberId);
+	}
+	
+    // 💡 [유지] 4. 일괄 회원 탈퇴 (List<Integer>를 받아 처리)
+	public int deleteCheckMember(SqlSessionTemplate sqlSession, List<Integer> memberNoList) {
+		return sqlSession.update("adminMapper.deleteCheckMember", memberNoList);
+	}
+	
+    // 💡 [유지] 5. 회원 이름으로 검색
+	public List<Member> searchMemberByName(SqlSessionTemplate sqlSession, String memberName) {
+		return sqlSession.selectList("adminMapper.searchMemberByName", memberName);
+	}
+	
+    // 💡 [유지] 6. 회원 아이디로 검색
+	public Member searchMemberById(SqlSessionTemplate sqlSession, String memberId) {
+		return sqlSession.selectOne("adminMapper.searchMemberById", memberId);
+	}
+	
+    // 💡 [유지] 7. 회원 상세 조회 (memberNo 기준)
+	public Member selectMemberDetail(SqlSessionTemplate sqlSession, int memberNo) {
+		return sqlSession.selectOne("adminMapper.selectMemberDetail", memberNo);
+    }
+}

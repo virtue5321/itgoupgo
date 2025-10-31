@@ -1,0 +1,92 @@
+package com.itgoupgo.community.free.model.vo;
+
+import java.sql.Date;
+
+public class FreeBbs {
+
+	private int freeNo; //FREE_NO	NUMBER
+	private String freeTitle; // FREE_TITLE	VARCHAR2(100 BYTE)
+	private String freeContent; // FREE_CONTENT	VARCHAR2(4000 BYTE)
+	private Date freeCreateDate; // FREE_CREATE_DATE	DATE
+	private int freeView; //FREE_VIEW	NUMBER
+	private String freeDeleteStatus; // FREE_DELETE_STATUS	CHAR(1 BYTE)
+	private int memberNo; // MEMBER_NO	NUMBER
+	
+	public FreeBbs() {}
+	
+	public FreeBbs(int freeNo, String freeTitle, String freeContent, Date freeCreateDate, int freeView,
+			String freeDeleteStatus, int memberNo) {
+		super();
+		this.freeNo = freeNo;
+		this.freeTitle = freeTitle;
+		this.freeContent = freeContent;
+		this.freeCreateDate = freeCreateDate;
+		this.freeView = freeView;
+		this.freeDeleteStatus = freeDeleteStatus;
+		this.memberNo = memberNo;
+	}
+
+	public int getFreeNo() {
+		return freeNo;
+	}
+
+	public void setFreeNo(int freeNo) {
+		this.freeNo = freeNo;
+	}
+
+	public String getFreeTitle() {
+		return freeTitle;
+	}
+
+	public void setFreeTitle(String freeTitle) {
+		this.freeTitle = freeTitle;
+	}
+
+	public String getFreeContent() {
+		return freeContent;
+	}
+
+	public void setFreeContent(String freeContent) {
+		this.freeContent = freeContent;
+	}
+
+	public Date getFreeCreateDate() {
+		return freeCreateDate;
+	}
+
+	public void setFreeCreateDate(Date freeCreateDate) {
+		this.freeCreateDate = freeCreateDate;
+	}
+
+	public int getFreeView() {
+		return freeView;
+	}
+
+	public void setFreeView(int freeView) {
+		this.freeView = freeView;
+	}
+
+	public String getFreeDeleteStatus() {
+		return freeDeleteStatus;
+	}
+
+	public void setFreeDeleteStatus(String freeDeleteStatus) {
+		this.freeDeleteStatus = freeDeleteStatus;
+	}
+
+	public int getMemberNo() {
+		return memberNo;
+	}
+
+	public void setMemberNo(int memberNo) {
+		this.memberNo = memberNo;
+	}
+
+	@Override
+	public String toString() {
+		return "FreeBbs [freeNo=" + freeNo + ", freeTitle=" + freeTitle + ", freeContent=" + freeContent
+				+ ", freeCreateDate=" + freeCreateDate + ", freeView=" + freeView + ", freeDeleteStatus="
+				+ freeDeleteStatus + ", memberNo=" + memberNo + "]";
+	}`1
+	
+}

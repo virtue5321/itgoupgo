@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>통계</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="resources/image/logo.png" width="80">
+      관리자 페이지
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <ul>
+        <li><a href="index.html">🏠 대시보드</a></li>
+        <li><a href="memberManage.html">👥 회원 관리</a></li>
+        <li><a href="postManage.html">📝 게시글 관리</a></li>
+        <li><a href="commentManage.html">💬 댓글 관리</a></li>
+        <li><a href="stats.html" class="active">📊 통계</a></li>
+        <li><a href="logout.html">🚪 로그아웃</a></li>
+      </ul>
+    </aside>
+
+    <main>
+      <h1>📊 통계</h1>
+      <p>사이트 활동에 대한 심층 통계 데이터를 확인합니다.</p>
+
+      <div style="margin-bottom: 30px; display:flex; gap:10px; align-items:center; background:#fff; padding:15px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
+        <label style="font-weight:600;">데이터 조회 기간:</label>
+        <select id="periodSelect" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+          <option value="weekly">최근 7일</option>
+          <option value="monthly">최근 30일</option>
+        </select>
+        <button id="queryButton" style="background:#5a5ce8; color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer;">조회</button>
+      </div>
+
+      <div style="display:flex; gap:20px; margin-top:20px;">
+        
+        <div style="flex:2; background:#fff; padding:20px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
+          <h3 id="trafficTitle">기간별 방문자 추이 (UV/PV)</h3>
+          <div style="height:250px; margin-top:15px;">
+            <canvas id="trafficChart"></canvas>
+          </div>
+        </div>
+
+        <div style="flex:1; background:#fff; padding:20px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
+          <h3 id="memberTitle">회원 가입 추이</h3>
+          <div style="height:250px; margin-top:15px;">
+            <canvas id="memberChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:20px; margin-top:20px;">
+        
+        <div style="flex:1; background:#fff; padding:20px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
+          <h3>게시판별 콘텐츠 비율 (누적)</h3>
+          <div style="height:200px; padding:15px; display:flex; align-items:center; justify-content:center;">
+            <canvas id="ratioChart" style="max-height: 200px;"></canvas>
+          </div>
+        </div>
+
+        <div style="flex:1; background:#fff; padding:20px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
+          <h3>👍 인기 게시글 TOP 5 (좋아요 순)</h3>
+          <table border="1" cellpadding="10" cellspacing="0" style="width:100%; background:white; border-collapse:collapse; text-align:center; margin-top:15px;">
+            <tr style="background:#f3f4f6;">
+              <th>순위</th><th>제목</th><th>좋아요 수</th>
+            </tr>
+            <tr><td>1</td><td style="text-align:left;"><a href="#" style="color:#5a5ce8; text-decoration:none;">사이트 기능 팁 모음</a></td><td>587</td></tr>
+            <tr><td>2</td><td style="text-align:left;"><a href="#" style="color:#5a5ce8; text-decoration:none;">새로운 UI/UX 피드백</a></td><td>420</td></tr>
+            <tr><td>3</td><td style="text-align:left;"><a href="#" style="color:#5a5ce8; text-decoration:none;">주간 베스트 코멘트</a></td><td>350</td></tr>
+            <tr><td>4</td><td style="text-align:left;"><a href="#" style="color:#5a5ce8; text-decoration:none;">운영진에게 질문!</a></td><td>295</td></tr>
+            <tr><td>5</td><td style="text-align:left;"><a href="#" style="color:#5a5ce8; text-decoration:none;">이번 주 이슈 총정리</a></td><td>210</td></tr>
+          </table>
+        </div>
+
+        <div style="flex:1; background:#fff; padding:20px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
+          <h3>💬 활발한 게시글 TOP 5 (댓글 순)</h3>
+          <table border="1" cellpadding="10" cellspacing="0" style="width:100%; background:white; border-collapse:collapse; text-align:center; margin-top:15px;">
+            <tr style="background:#f3f4f6;">
+              <th>순위</th><th>제목</th><th>댓글 수</th>
+            </tr>
+            <tr><td>1</td><td style="text-align:left;"><a href="#" style="color:#5a5ce8; text-decoration:none;">🔥자유 게시판 토론 주제</a></td><td>155</td></tr>
+            <tr><td>2</td><td style="text-align:left;"><a href="#" style="color:#5a5ce8; text-decoration:none;">익명 고민 상담소</a></td><td>120</td></tr>
+            <tr><td>3</td><td style="text-align:left;"><a href="#" style="color:#5a5ce8; text-decoration:none;">IT 기술 동향에 대한 생각</a></td><td>98</td></tr>
+            <tr><td>4</td><td style="text-align:left;"><a href="#" style="color:#5a5ce8; text-decoration:none;">최신 게임 출시 토론</a></td><td>75</td></tr>
+            <tr><td>5</td><td style="text-align:left;"><a href="#" style="color:#5a5ce8; text-decoration:none;">오늘의 소확행 자랑</a></td><td>62</td></tr>
+          </table>
+        </div>
+
+      </div>
+      
+    </main>
+  </div>
+
+  <footer>ⓒ 2025 IT GO UP GO. All Rights Reserved.</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const periodSelect = document.getElementById('periodSelect');
+    const queryButton = document.getElementById('queryButton');
+    const trafficTitle = document.getElementById('trafficTitle');
+    const memberTitle = document.getElementById('memberTitle');
+
+    // 1. 차트 인스턴스 초기화 (전역 변수로 선언)
+    const trafficCtx = document.getElementById('trafficChart');
+    const trafficChart = new Chart(trafficCtx, {
+        type: 'line',
+        data: { labels: [], datasets: [{ label: '일별 방문자 수 (UV)', data: [], borderColor: '#5a5ce8', borderWidth: 2, tension: 0.3, fill: false }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+    });
+
+    const memberCtx = document.getElementById('memberChart');
+    const memberChart = new Chart(memberCtx, {
+        type: 'bar',
+        data: { labels: [], datasets: [{ label: '신규 가입자 수', data: [], backgroundColor: '#28a745', borderRadius: 4 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+    });
+
+    // 게시판 비율 (도넛 차트 - 데이터 고정)
+    const ratioCtx = document.getElementById('ratioChart');
+    new Chart(ratioCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['자유 게시판 (60%)', '정보 나눔 (25%)', '공지사항 (15%)'],
+            datasets: [{
+                data: [60, 25, 15],
+                backgroundColor: ['#5a5ce8', '#ffc107', '#dc3545'],
+                hoverOffset: 4
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+    });
+
+    // 2. 더미 데이터 정의
+    const dataSets = {
+        weekly: {
+            trafficLabels: ['월', '화', '수', '목', '금', '토', '일'],
+            trafficData: [1200, 1500, 1000, 1800, 1400, 2200, 1900],
+            memberLabels: ['1주', '2주', '3주', '4주'],
+            memberData: [150, 120, 180, 140],
+            trafficTitle: '최근 7일간 일별 방문자 추이'
+        },
+        monthly: {
+            trafficLabels: ['1주차', '2주차', '3주차', '4주차'],
+            trafficData: [10500, 12800, 9500, 15000],
+            memberLabels: ['1월', '2월', '3월', '4월', '5월'],
+            memberData: [500, 800, 1200, 650, 900],
+            trafficTitle: '최근 30일간 주별 방문자 추이'
+        }
+    };
+
+    // 3. 차트 업데이트 함수
+    function updateCharts(period) {
+        const data = dataSets[period];
+        if (!data) return;
+
+        // 방문자 차트 업데이트
+        trafficChart.data.labels = data.trafficLabels;
+        trafficChart.data.datasets[0].data = data.trafficData;
+        trafficChart.update();
+        trafficTitle.textContent = data.trafficTitle;
+
+        // 회원 차트 업데이트
+        memberChart.data.labels = data.memberLabels;
+        memberChart.data.datasets[0].data = data.memberData;
+        memberChart.update();
+        memberTitle.textContent = period === 'weekly' ? '최근 4주간 주별 가입 추이' : '최근 5개월간 월별 가입 추이';
+    }
+
+    // 4. 이벤트 리스너 연결
+    queryButton.addEventListener('click', () => {
+        const selectedPeriod = periodSelect.value;
+        updateCharts(selectedPeriod);
+    });
+
+    // 초기 로드 시 '최근 7일' 데이터로 차트 그리기
+    updateCharts(periodSelect.value); 
+});
+</script>
+</body>
+</html>

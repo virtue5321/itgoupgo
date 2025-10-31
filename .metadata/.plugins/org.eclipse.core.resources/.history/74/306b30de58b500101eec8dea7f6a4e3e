@@ -1,0 +1,563 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>회원 관리</title>
+  <%-- 💡 기존 CSS 파일 경로는 유지하지만, UI 개선을 위해 여기에 추가적인 스타일을 정의합니다. --%>
+  <link rel="stylesheet" href="<c:url value="/resources/css/adminStyle.css" />">
+  <style>
+    /* ----------------------------------- */
+    /* 1. 기본 스타일 및 레이아웃 재정의 */
+    /* ----------------------------------- */
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f8f9fa; /* 라이트 그레이 배경 */
+        color: #343a40;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    header {
+        background-color: #ffffff;
+        color: #343a40;
+        padding: 15px 30px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    header .logo {
+        display: flex;
+        align-items: center;
+        font-size: 1.25rem;
+        font-weight: 600;
+        gap: 10px;
+    }
+
+    header .logo img {
+        border-radius: 5px;
+    }
+
+    .layout {
+        display: flex;
+        flex: 1;
+    }
+
+    /* ----------------------------------- */
+    /* 2. 사이드바 (Sidebar) */
+    /* ----------------------------------- */
+    .sidebar {
+        width: 250px;
+        background-color: #343a40; /* 다크 모드 스타일 */
+        color: #ffffff;
+        padding: 20px 0;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        flex-shrink: 0;
+    }
+
+    .sidebar ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .sidebar li a {
+        display: block;
+        padding: 15px 30px;
+        text-decoration: none;
+        color: #adb5bd; /* 연한 텍스트 색상 */
+        transition: background-color 0.3s, color 0.3s;
+        font-size: 1rem;
+    }
+
+    .sidebar li a:hover {
+        background-color: #495057;
+        color: #ffffff;
+    }
+
+    .sidebar li a.active {
+        background-color: #5a5ce8; /* 메인 액센트 색상 */
+        color: #ffffff;
+        border-left: 5px solid #7c7eff; /* 강조 선 */
+        padding-left: 25px;
+    }
+
+    /* ----------------------------------- */
+    /* 3. 메인 콘텐츠 (Main Content) */
+    /* ----------------------------------- */
+    main {
+        flex-grow: 1;
+        padding: 30px;
+        background-color: #f8f9fa;
+    }
+
+    main h1 {
+        font-size: 2rem;
+        color: #343a40;
+        margin-bottom: 5px;
+        border-bottom: 3px solid #5a5ce8; /* 액센트 강조 */
+        padding-bottom: 10px;
+        display: inline-block;
+    }
+
+    main p {
+        color: #6c757d;
+        margin-bottom: 25px;
+    }
+
+    /* ----------------------------------- */
+    /* 4. 검색 폼 (Search Form) 개선 */
+    /* ----------------------------------- */
+    .search-form {
+        background: #ffffff !important; /* 배경색 오버라이드 */
+        padding: 20px !important;
+        border-radius: 12px !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+        margin-bottom: 30px !important;
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        border: 1px solid #dee2e6;
+    }
+
+    .search-form select, .search-form input[type="text"] {
+        padding: 10px 15px;
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        transition: border-color 0.3s, box-shadow 0.3s;
+        height: 40px;
+        box-sizing: border-box;
+    }
+
+    .search-form input[type="text"] {
+        flex-grow: 1;
+    }
+
+    .search-form select:focus, .search-form input[type="text"]:focus {
+        border-color: #5a5ce8;
+        box-shadow: 0 0 0 0.2rem rgba(90, 92, 232, 0.25);
+        outline: none;
+    }
+
+    /* ----------------------------------- */
+    /* 5. 버튼 스타일 통일 및 개선 */
+    /* ----------------------------------- */
+    .btn {
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: none;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        text-decoration: none;
+    }
+
+    /* 검색 버튼 (Primary) */
+    .search-form button[type="submit"] {
+        background-color: #5a5ce8 !important;
+        color: white !important;
+    }
+    .search-form button[type="submit"]:hover {
+        background-color: #4a4cd6 !important;
+        box-shadow: 0 4px 8px rgba(90, 92, 232, 0.3);
+    }
+
+    /* Danger 버튼 (일괄/단일 탈퇴) */
+    .btn-danger {
+        background-color: #dc3545; /* Red */
+        color: white;
+    }
+    .btn-danger:hover {
+        background-color: #c82333;
+        box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+    }
+
+    /* ----------------------------------- */
+    /* 6. 테이블 스타일 (Table) 개선 */
+    /* ----------------------------------- */
+    table {
+        width: 100%;
+        border-collapse: separate; /* border-radius 적용을 위해 */
+        border-spacing: 0;
+        margin-top: 15px;
+        background-color: #ffffff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        border-radius: 12px;
+        overflow: hidden; /* 테이블 라운딩을 위해 */
+    }
+
+    table thead th {
+        background-color: #e9ecef; /* 헤더 배경 */
+        color: #495057;
+        font-weight: 600;
+        padding: 15px 10px;
+        text-align: center;
+        white-space: nowrap;
+        border-bottom: 2px solid #dee2e6;
+    }
+    
+    table tbody tr:nth-child(even) {
+        background-color: #f8f9fa; /* 스트라이프 효과 */
+    }
+    
+    table tbody tr:hover {
+        background-color: #e2e3ff; /* 호버 효과 */
+        transition: background-color 0.2s;
+    }
+
+    table td {
+        padding: 12px 10px;
+        text-align: center;
+        border-bottom: 1px solid #e9ecef;
+        vertical-align: middle;
+        word-break: keep-all;
+    }
+    
+    table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* 아이디 링크 스타일 */
+    table td a {
+        color: #5a5ce8;
+        font-weight: 500;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+    table td a:hover {
+        color: #4a4cd6;
+        text-decoration: underline;
+    }
+    
+    /* 체크박스 크기 조정 */
+    input[type="checkbox"] {
+        transform: scale(1.2);
+    }
+
+    /* 탈퇴 상태 텍스트 */
+    table .btn-danger + span {
+        color: #6c757d !important;
+        font-style: italic;
+    }
+
+    /* ----------------------------------- */
+    /* 7. 페이징바 스타일 */
+    /* ----------------------------------- */
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        padding: 30px 0 10px;
+        gap: 5px;
+        font-size: 1rem;
+    }
+    .pagination-container a, .pagination-container span {
+        padding: 8px 14px;
+        text-decoration: none;
+        color: #495057;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+    }
+    .pagination-container a:hover {
+        background-color: #e9ecef;
+        border-color: #5a5ce8;
+    }
+    .pagination-container .active {
+        background-color: #5a5ce8; 
+        color: white;
+        border: 1px solid #5a5ce8;
+        font-weight: 700;
+        pointer-events: none; /* 클릭 방지 */
+    }
+    .pagination-container .disabled {
+        color: #adb5bd;
+        pointer-events: none;
+        background-color: #f1f3f5;
+        border-color: #e9ecef;
+    }
+
+    /* ----------------------------------- */
+    /* 8. 푸터 */
+    /* ----------------------------------- */
+    footer {
+        padding: 15px 30px;
+        background-color: #e9ecef;
+        color: #6c757d;
+        text-align: center;
+        font-size: 0.85rem;
+        border-top: 1px solid #dee2e6;
+    }
+
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <%-- 이미지 경로는 그대로 유지 --%>
+      <img src="<c:url value="/resources/images/logo1.PNG" />" width="80" alt="로고">
+      관리자 페이지
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <ul>
+        <li><a href="<c:url value="/admin/dashboard" />">🏠 대시보드</a></li>
+        <li><a href="<c:url value="/admin/member" />" class="active">👥 회원 관리</a></li>
+        <li><a href="<c:url value="/admin/post" />">📝 게시글 관리</a></li>
+        <li><a href="<c:url value="/admin/reply" />">💬 댓글 관리</a></li>
+        <li><a href="<c:url value="/admin/stats" />">📊 통계</a></li>
+        <li><a href="<c:url value="/admin/logout" />">🚪 로그아웃</a></li>
+      </ul>
+    </aside>
+
+    <main>
+      <h1>👥 회원 관리</h1>
+      <p>등록된 회원 목록을 확인하고 관리할 수 있습니다.</p>
+
+      <%-- 검색 폼 --%>
+      <form class="search-form" id="searchForm" 
+            action="<c:url value="/admin/searchMemberName" />" method="get">
+        
+        <select name="searchCondition" id="searchCondition">
+          <option value="searchMemberName" ${searchCondition eq 'searchMemberName' ? 'selected' : ''}>이름</option>
+          <option value="searchMemberId" ${searchCondition eq 'searchMemberId' ? 'selected' : ''}>아이디</option>
+        </select>
+        
+        <input type="text" name="keyword"
+               value="${searchKeyword}" 
+               placeholder="검색어를 입력하세요">
+        
+        <button type="submit">검색</button>
+      </form>
+      
+      <%-- 일괄 삭제 폼 (POST 요청을 위해 필요) --%>
+      <form id="bulkDeleteForm" action="<c:url value="/admin/deleteCheckMember" />" method="post" style="display:none;"></form>
+
+      <div style="display:flex; justify-content:flex-end; align-items:center; margin-bottom:15px; margin-top:20px;">
+          <%-- 일괄 삭제 버튼, JS 함수 호출 --%>
+          <button class="btn btn-danger" onclick="confirmBulkDelete()">
+            선택 항목 일괄 탈퇴
+          </button>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="selectAllCheckboxMember"></th> 
+            <th>회원번호</th>
+            <th>아이디</th>
+            <th>이름</th>
+            <th>성별</th>
+            <th>전화번호</th>
+            <th>이메일</th>
+            <th>가입일</th>
+            <th>관리</th>
+          </tr>
+        
+        </thead>
+        <tbody>
+          <c:choose>
+            <c:when test="${empty memberList}">
+              <tr>
+                <td colspan="9">
+                    <c:if test="${not empty searchKeyword}">
+                        "${searchKeyword}"에 대한 검색 결과가 없습니다.
+                    </c:if>
+                    <c:if test="${empty searchKeyword}">
+                        등록된 회원 정보가 없습니다.
+                    </c:if>
+                </td>
+              </tr>
+            </c:when>
+            <c:otherwise>
+              <c:forEach var="member" items="${memberList}">
+                <tr>
+                  <%-- 일괄 탈퇴를 위한 체크박스 --%>
+                  <td><input type="checkbox" class="itemCheckboxMember" name="memberNoList" value="${member.memberNo}"></td>
+                  <td>${member.memberNo}</td>
+                  
+                  <%-- 회원 상세 보기 링크 (아이디 클릭) --%>
+                  <td>
+                    <a href="<c:url value="/admin/memberDetail?memberNo=${member.memberNo}" />">
+                        ${member.memberId}
+                    </a>
+                  </td>
+          
+                  <td>${member.memberName}</td>
+                  <td>${member.gender eq 'M' ? '남' : (member.gender eq 'F' ? '여' : '-')}</td>
+                  <td>${member.phone}</td>
+                  <td>${member.email}</td>
+                  <td><fmt:formatDate value="${member.enrollDate}" pattern="yyyy-MM-dd" /></td>
+                  <td>
+                    <c:choose>
+                      <c:when test="${member.memberStatus eq 'Y'}">
+                        <%-- 단일 탈퇴 버튼 --%>
+                        <button class="btn btn-danger btn-sm"
+                                onclick="if(confirm('${member.memberName} 님을 정말 탈퇴시키겠습니까?')) { 
+                                    location.href='<c:url value="/admin/delete?memberId=${member.memberId}" />'; 
+                                }">
+                          단일 탈퇴
+                        </button>
+                      </c:when>
+                      <c:otherwise>
+                        <span style="font-size:0.9em;">탈퇴됨</span>
+                      </c:otherwise>
+                    </c:choose>
+                  </td>
+                </tr>
+              </c:forEach>
+            </c:otherwise>
+          </c:choose>
+        </tbody>
+      </table>
+
+      <%-- 페이징바 동적 출력 로직 --%>
+      <div class="pagination-container">
+        
+        <%-- 검색 중일 때와 아닐 때, URL 경로를 결정 --%>
+        <c:choose>
+            <c:when test="${not empty searchKeyword}">
+                <%-- 검색 결과 페이징: URL은 /admin/searchMemberName 또는 /admin/searchMemberId --%>
+                <c:set var="pageLinkUrl" value="/admin/${searchCondition}" />
+                <c:set var="searchQueryParam" value="&keyword=${searchKeyword}" />
+            </c:when>
+            <c:otherwise>
+                <%-- 일반 목록 페이징: URL은 /admin/member --%>
+                <c:set var="pageLinkUrl" value="/admin/member" />
+                <c:set var="searchQueryParam" value="" />
+            </c:otherwise>
+        </c:choose>
+
+        <%-- Controller에서 'pageInfo'라는 이름으로 Pagination 객체를 전달했다고 가정 --%>
+        <c:set var="pi" value="${pageInfo}" />
+
+        <%-- 1. 맨 처음으로 (<<) --%>
+        <c:choose>
+            <c:when test="${pi.currentPage le 1}">
+                <span class="disabled">&lt;&lt;</span>
+            </c:when>
+            <c:otherwise>
+                <a href="<c:url value="${pageLinkUrl}" />?currentPage=1${searchQueryParam}">&lt;&lt;</a>
+            </c:otherwise>
+        </c:choose>
+
+        <%-- 2. 이전 페이지 그룹으로 (<) --%>
+        <c:choose>
+            <c:when test="${pi.currentPage le 1}">
+                <span class="disabled">&lt;</span>
+            </c:when>
+            <c:otherwise>
+                <a href="<c:url value="${pageLinkUrl}" />?currentPage=${pi.currentPage - 1}${searchQueryParam}">&lt;</a>
+            </c:otherwise>
+        </c:choose>
+
+        <%-- 3. 페이지 번호 --%>
+        <c:forEach begin="${pi.startPage}" end="${pi.endPage}" var="p">
+            <c:choose>
+                <c:when test="${pi.currentPage eq p}">
+                    <span class="active">${p}</span>
+                </c:when>
+                <c:otherwise>
+                    <a href="<c:url value="${pageLinkUrl}" />?currentPage=${p}${searchQueryParam}">${p}</a>
+                </c:otherwise>
+            </c:choose>
+        </c:forEach>
+
+        <%-- 4. 다음 페이지 그룹으로 (>) --%>
+        <c:choose>
+            <c:when test="${pi.currentPage eq pi.maxPage || pi.maxPage eq 0}">
+                <span class="disabled">&gt;</span>
+            </c:when>
+            <c:otherwise>
+                <a href="<c:url value="${pageLinkUrl}" />?currentPage=${pi.currentPage + 1}${searchQueryParam}">&gt;</a>
+            </c:otherwise>
+        </c:choose>
+
+        <%-- 5. 맨 끝으로 (>>) --%>
+        <c:choose>
+            <c:when test="${pi.currentPage eq pi.maxPage || pi.maxPage eq 0}">
+                <span class="disabled">&gt;&gt;</span>
+            </c:when>
+            <c:otherwise>
+                <a href="<c:url value="${pageLinkUrl}" />?currentPage=${pi.maxPage}${searchQueryParam}">&gt;&gt;</a>
+            </c:otherwise>
+        </c:choose>
+      </div>
+    </main>
+  </div>
+
+  <footer>ⓒ 2025 IT GO UP GO. All Rights Reserved.</footer>
+
+<script>
+    // 1. 검색 폼 액션 변경 로직 (기존 로직 유지)
+    document.getElementById('searchForm').addEventListener('submit', function(e) {
+        const condition = document.getElementById('searchCondition').value;
+        const form = e.target;
+        // 선택된 옵션(searchMemberName 또는 searchMemberId)에 따라 action 경로 변경
+        form.action = `<c:url value="/admin/" />` + condition;
+    });
+
+    // 2. 일괄 삭제 로직 (confirmBulkDelete 함수) (기존 로직 유지)
+    function confirmBulkDelete() {
+        const selectedCheckboxes = document.querySelectorAll('.itemCheckboxMember:checked');
+
+        if (selectedCheckboxes.length === 0) {
+            alert('일괄 탈퇴할 회원을 1명 이상 선택해 주세요.');
+            return;
+        }
+
+        if (confirm(`총 ${selectedCheckboxes.length}명의 회원을 일괄 탈퇴 처리하시겠습니까?`)) {
+            const form = document.getElementById('bulkDeleteForm');
+            
+            // 이전 전송 시도에서 추가된 필드가 있다면 모두 제거
+            form.innerHTML = ''; 
+
+            // 선택된 체크박스의 value를 hidden input으로 폼에 추가하여 전송
+            selectedCheckboxes.forEach(checkbox => {
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'memberNoList'; // Controller의 @RequestParam 이름과 일치
+                hiddenInput.value = checkbox.value;
+                form.appendChild(hiddenInput);
+            });
+            
+            form.submit(); // POST 요청 전송
+        }
+    }
+
+    // 3. 체크박스 전체 선택/해제 기능 (기존 로직 유지)
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const selectAllCheckbox = document.getElementById('selectAllCheckboxMember');
+        const itemCheckboxes = document.querySelectorAll('.itemCheckboxMember');
+
+        selectAllCheckbox.addEventListener('change', function() {
+            itemCheckboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+        });
+        
+        itemCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                const checkedItems = document.querySelectorAll('.itemCheckboxMember:checked').length;
+                if (!checkbox.checked) {
+                    selectAllCheckbox.checked = false;
+                } else if (checkedItems === itemCheckboxes.length) {
+                    selectAllCheckbox.checked = true;
+                }
+            });
+        });
+    });
+ </script>
+</body>
+</html>

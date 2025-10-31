@@ -1,0 +1,59 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
+<!DOCTYPE html>
+
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>관리자 - 스터디 게시판 관리</title>
+    <link rel="stylesheet" href="<c:url value="/resources/css/adminStyle.css" />">
+    <style>
+        /* 💡 스타일은 noticeManage.jsp와 동일합니다 */
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            padding: 20px 0;
+            gap: 5px;
+        }
+        .pagination-container a, .pagination-container span {
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #333;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .pagination-container a:hover {
+            background-color: #f0f0f0;
+        }
+        .pagination-container .active {
+            background-color: #5a5ce8;
+            color: white;
+            border-color: #5a5ce8;
+        }
+        .status-text.deleted { 
+            color: red; 
+            font-weight: bold;
+        }
+        /* [추가] 삭제된 게시글 행 스타일 */
+        .deleted-post { 
+            background-color: #f8f8f8; 
+            color: #999; 
+        }
+        .deleted-post a, .deleted-post .status-text { 
+            color: #999 !important;
+        }
+    </style>
+</head>
+<body>
+    <c:import url="/WEB-INF/views/admin/adminNav.jsp" />
+
+    <div class="admin-container">
+        <h1 class="main-title">스터디 게시판 게시글 관리</h1>
+
+        <div class="search-area">
+            <form action="searchStudy" method="GET" onsubmit="return validateSearch(this);">
+                <select name="condition" class="search-select">
+                    <option value="title">제목</

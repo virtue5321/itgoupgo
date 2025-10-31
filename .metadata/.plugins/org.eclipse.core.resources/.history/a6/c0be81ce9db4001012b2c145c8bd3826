@@ -1,0 +1,59 @@
+package com.itgoupgo.community.admin.model.service;
+
+import java.util.List;
+import java.util.Map; // Map import 추가
+
+import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.itgoupgo.community.admin.model.dao.AdminDao;
+import com.itgoupgo.community.common.model.vo.PageInfo;
+import com.itgoupgo.community.member.model.vo.Member;
+
+@Service
+public class AdminService {
+
+	@Autowired
+	private SqlSessionTemplate sqlSession;
+	
+	@Autowired
+	private AdminDao adminDao; 
+	
+    // 💡 1. 전체 회원 수 조회 (페이징용)
+	public int selectListCount() { return adminDao.selectListCount(sqlSession); }
+	
+    // 💡 2. 페이징 정보(PageInfo)를 받아 전체 목록 조회
+	public List<Member> selectMemberList(PageInfo pi) { return adminDao.selectMemberList(sqlSession, pi); }
+	
+    // 🚩 [수정/통일] 3. 검색 조건에 맞는 회원 수 조회 (에러 발생 지점)
+    public int selectSearchListCount(Map<String, String> searchMap) {
+        return adminDao.selectSearchListCount(sqlSession, searchMap);
+    }
+
+    // 🚩 [수정/통일] 4. 검색 조건에 맞는 페이징 처리된 목록 조회
+    public List<Member> selectSearchMemberList(PageInfo pi, Map<String, String> searchMap) {
+        return adminDao.selectSearchMemberList(sqlSession, pi, searchMap);
+    }
+
+    // 💡 5. 단일 회원 탈퇴 요청에 대한 트랜잭션 처리
+	@Transactional
+	public int deleteMemberAdmin(String memberId) { return adminDao.deleteMemberAdmin(sqlSession, memberId); }
+	
+    // 💡 6. 일괄 회원 탈퇴 트랜잭션 처리
+    @Transactional
+    public int deleteCheckMember(List<Integer> memberNoList) { return adminDao.deleteCheckMember(sqlSession, memberNoList); }
+    
+    // 💡 7. 회원 상세 조회
+    public Member selectMemberDetail(int memberNo) { return adminDao.selectMemberDetail(sqlSession, memberNo); }
+    
+    // 🚩 [KPI 추가] 8. 총 회원 수 
+    public int selectTotalMemberCount() { return adminDao.selectTotalMemberCount(sqlSession); }
+    
+    // 🚩 [KPI 추가] 9. 신규 회원 수 
+    public int selectTodayNewMemberCount() { return adminDao.selectTodayNewMemberCount(sqlSession); }
+    
+    // 🚩 [KPI 추가] 10. 총 게시글 수
+    public int selectTotalPostCount() { return adminDao.selectTotalPostCount(sqlSession); }
+}

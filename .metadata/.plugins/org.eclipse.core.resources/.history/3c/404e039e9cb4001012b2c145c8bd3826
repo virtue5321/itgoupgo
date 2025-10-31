@@ -1,0 +1,59 @@
+<%-- memberManage.jsp 파일의 <select> 부분 수정 --%>
+<select name="searchCondition" id="searchCondition"
+        style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+  <option value="searchMemberName" ${searchCondition eq 'searchMemberName' ? 'selected' : ''}>이름</option>
+  <option value="searchMemberId" ${searchCondition eq 'searchMemberId' ? 'selected' : ''}>아이디</option>
+</select>
+
+<div class="pagination-container">
+    <%-- 🚩 [수정] pi 객체가 존재할 때만 페이징바를 출력 (검색 결과 페이지에서 pi는 null) --%>
+    <c:if test="${not empty pi}">
+        <c:set var="pi" value="${pi}" />
+
+        <c:choose>
+            <c:when test="${pi.currentPage eq 1}">
+                <span class="disabled">&lt;</span>
+            </c:when>
+            <c:otherwise>
+                <%-- 전체 목록 URL은 /admin/member를 사용 --%>
+                <a href="<c:url value="/admin/member?cpage=${pi.currentPage - 1}" />">&lt;</a>
+            </c:otherwise>
+        </c:choose>
+
+        <c:forEach begin="${pi.startPage}" end="${pi.endPage}" var="p">
+            <c:choose>
+                <c:when test="${pi.currentPage eq p}">
+                    <a href="#" class="active">${p}</a>
+                </c:when>
+                <c:otherwise>
+                    <a href="<c:url value="/admin/member?cpage=${p}" />">${p}</a>
+                </c:otherwise>
+            </c:choose>
+        </c:forEach>
+
+        <c:choose>
+            <c:when test="${pi.currentPage eq pi.maxPage || pi.maxPage eq 0}">
+                <span class="disabled">&gt;</span>
+            </c:when>
+            <c:otherwise>
+                <a href="<c:url value="/admin/member?cpage=${pi.currentPage + 1}" />">&gt;</a>
+            </c:otherwise>
+        </c:choose>
+    </c:if>
+</div>
+
+<script>
+    // 🔴 1. 검색 폼 액션 변경 로직 (404 오류 해결을 위해 복구)
+    document.getElementById('searchForm').addEventListener('submit', function(e) {
+        const condition = document.getElementById('searchCondition').value;
+        const form = e.target;
+        // 선택된 옵션(searchMemberName 또는 searchMemberId)에 따라 action 경로 변경
+        // 이 경로들은 이제 Controller에 복구된 메소드가 처리합니다.
+        form.action = `<c:url value="/admin/" />` + condition;
+    });
+
+    // 🔴 2. 일괄 삭제 로직 (confirmBulkDelete 함수) (기존 로직 유지)
+    // ...
+    // 🔴 3. 체크박스 전체 선택/해제 기능 (기존 로직 유지)
+    // ...
+</script>

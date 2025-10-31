@@ -1,0 +1,13 @@
+package com.itgoupgo.community.info.model.vo;
+
+public class InfoBbs {
+
+	private int infoNo; // INFO_NO	NUMBER
+	private String infoTitle; // INFO_TITLE	VARCHAR2(100 BYTE)
+	private String infoContent; // INFO_CONTENT	VARCHAR2(4000 BYTE)
+	private Date infoCreateDate; // INFO_CREATE_DATE	DATE
+	private int infoView; // INFO_VIEW	NUMBER
+	private String infoCategory; // INFO_CATEGORY	VARCHAR2(40 BYTE)
+	private String infoDeleteStatus; // INFO_DELETE_STATUS	CHAR(1 BYTE)
+	private int memberNo; // MEMBER_NO	NUMBER
+}

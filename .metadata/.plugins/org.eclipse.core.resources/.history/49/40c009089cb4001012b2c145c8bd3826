@@ -1,0 +1,75 @@
+package com.itgoupgo.community.admin.model.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.session.RowBounds;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.stereotype.Repository;
+
+import com.itgoupgo.community.common.model.vo.PageInfo;
+import com.itgoupgo.community.member.model.vo.Member;
+
+@Repository
+public class AdminDao {
+	
+    // 💡 [유지] 1. 전체 회원 수 조회 (페이징용)
+    public int selectListCount(SqlSessionTemplate sqlSession) {
+        return sqlSession.selectOne("adminMapper.selectListCount");
+    }
+    
+    // 💡 [유지] 2. 페이징 처리된 전체 회원 목록 조회
+ 	public List<Member> selectMemberList(SqlSessionTemplate sqlSession, PageInfo pi) {
+ 	
+         int limit = pi.getBoardLimit();
+         int offset = (pi.getCurrentPage() - 1) * limit;
+         
+         RowBounds rowBounds = new RowBounds(offset, limit);
+         
+ 		return sqlSession.selectList("adminMapper.selectMemberList", null, rowBounds); 
+ 	}
+    
+    // 🚩 [추가] 3. 이름 검색 결과 총 개수 조회
+    public int selectSearchNameCount(SqlSessionTemplate sqlSession, String memberName) {
+        return sqlSession.selectOne("adminMapper.selectSearchNameCount", memberName);
+    }
+
+    // 🚩 [추가] 4. 아이디 검색 결과 총 개수 조회
+    public int selectSearchIdCount(SqlSessionTemplate sqlSession, String memberId) {
+        return sqlSession.selectOne("adminMapper.selectSearchIdCount", memberId);
+    }
+
+    // 🚩 [수정] 5. 회원 이름으로 검색 (메소드 유지 + 페이징 적용)
+	public List<Member> searchMemberByName(SqlSessionTemplate sqlSession, String memberName, PageInfo pi) {
+        
+        int limit = pi.getBoardLimit();
+        int offset = (pi.getCurrentPage() - 1) * limit;
+        RowBounds rowBounds = new RowBounds(offset, limit);
+
+		return sqlSession.selectList("adminMapper.searchMemberByName", memberName, rowBounds);
+	}
+	
+    // 🚩 [수정] 6. 회원 아이디로 검색 (메소드 유지 + List<Member> 반환 및 페이징 적용)
+	public List<Member> searchMemberById(SqlSessionTemplate sqlSession, String memberId, PageInfo pi) {
+        
+        int limit = pi.getBoardLimit();
+        int offset = (pi.getCurrentPage() - 1) * limit;
+        RowBounds rowBounds = new RowBounds(offset, limit);
+
+		return sqlSession.selectList("adminMapper.searchMemberById", memberId, rowBounds);
+	}
+ 	
+    // 💡 [유지] 7. 단일 회원 탈퇴
+	public int deleteMemberAdmin(SqlSessionTemplate sqlSession, String memberId) {
+		return sqlSession.update("adminMapper.deleteMemberAdmin", memberId);
+	}
+	
+    // 💡 [유지] 8. 일괄 회원 탈퇴
+	public int deleteCheckMember(SqlSessionTemplate sqlSession, List<Integer> memberNoList) {
+		return sqlSession.update("adminMapper.deleteCheckMember", memberNoList);
+	}
+	
+    // 💡 [유지] 9. 회원 상세 조회
+	public Member selectMemberDetail(SqlSessionTemplate sqlSession, int memberNo) {
+		return sqlSession.selectOne("adminMapper.selectMemberDetail", memberNo);
+    }
+}

@@ -1,0 +1,142 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %> 
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>자유 게시판 관리</title>
+
+    <link rel="stylesheet" href="<c:url value="/resources/css/adminStyle.css" />">
+</head>
+<body>
+    
+    <header>
+        <div class="logo">
+            <img src="<c:url value="/resources/images/logo1.PNG" />" width="80">
+            관리자 페이지
+        </div>
+    </header>
+
+    <div class="layout">
+        <%-- ✅ 사이드바: 자유 게시판 활성화 --%>
+        <aside class="sidebar">
+            <ul>
+                <li><a href="<c:url value="/admin/dashboard" />">🏠 대시보드</a></li>
+                <li><a href="<c:url value="/admin/member" />">👥 회원 관리</a></li>
+
+                <%-- '자유 게시판'이 현재 페이지이므로 'menu-open' 및 'active' 설정 --%>
+                <li id="postManageMenu" class="menu-open">
+                    <a href="javascript:void(0);" class="active" onclick="toggleSubmenu('postManageMenu')">📝 게시글 관리</a>
+                    
+                    <ul class="submenu">
+                        <li><a href="<c:url value="/admin/freeBbsManage" />" class="sub-active">자유 게시판</a></li>
+                        <li><a href="<c:url value="/admin/infoBbsManage" />">정보 공유 게시판</a></li>
+                        <li><a href="<c:url value="/admin/itBbsManage" />">IT 기술 게시판</a></li>
+                        <li><a href="<c:url value="/admin/noticeBbsManage" />">공지사항 게시판</a></li>
+                <li><a href="<c:url value="/admin/studyBbsManage" />">스터디 게시판</a></li>
+                <li><a href="<c:url value="/admin/knowledgeBbsManage" />">지식인 게시판</a></li>
+                    </ul>
+                </li>
+                
+                <li><a href="<c:url value="/admin/reply" />">💬 댓글 관리</a></li>
+                <li><a href="<c:url value="/admin/stats" />">📊 통계</a></li>
+                <li><a href="<c:url value="/admin/logout" />">🚪 로그아웃</a></li>
+            </ul>
+        </aside>
+        
+        <main>
+            <h1>📝 자유 게시판 관리</h1>
+            <p>자유 게시판에 등록된 게시글 목록을 확인하고 관리할 수 있습니다.</p>
+
+            <form class="search-form" id="searchForm" action="<c:url value="/admin/searchFreeBbsPostTitle" />" method="get">
+                <select name="searchCondition" id="searchCondition" class="form-select">
+                    <option value="searchFreeBbsPostTitle" ${searchCondition eq 'searchFreeBbsPostTitle' ? 'selected' : ''}>제목</option>
+                    <option value="searchFreeBbsPostWriter" ${searchCondition eq 'searchFreeBbsPostWriter' ? 'selected' : ''}>작성자</option>
+                </select>
+                <input type="text" name="keyword" value="${searchKeyword}" placeholder="검색어를 입력하세요">
+                <button type="submit" class="btn btn-primary">검색</button>
+            </form>
+
+            <form id="bulkDeleteForm" action="<c:url value="/admin/deleteFreeBbsCheckPost" />" method="post" style="display:none;"></form>
+
+            <div style="display:flex; justify-content:flex-end; margin-bottom:10px;">
+                <button class="btn btn-danger" onclick="confirmBulkDelete()">선택 게시글 일괄 삭제</button>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:5%;"><input type="checkbox" id="selectAllCheckboxPost"></th> 
+                        <th style="width:8%;">글번호</th>
+                        <th style="width:30%;">제목</th>
+                        <th style="width:15%;">작성자</th>
+                        <th style="width:12%;">작성일</th>
+                        <th style="width:8%;">조회수</th>
+                        <th style="width:12%;">관리</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <c:choose>
+                        <c:when test="${empty freeBbsList}">
+                            <tr><td colspan="7"><c:if test="${not empty searchKeyword}">"${searchKeyword}"에 대한 검색 결과가 없습니다.</c:if><c:if test="${empty searchKeyword}">등록된 게시글이 없습니다.</c:if></td></tr>
+                        </c:when>
+                        <c:otherwise>
+                            <c:forEach var="post" items="${freeBbsList}">
+                                <tr>
+                                    <td><input type="checkbox" class="itemCheckboxPost" name="bbsNoList" value="${post.bbsNo}"></td>
+                                    <td>${post.bbsNo}</td>
+                                    <td class="text-start">
+                                        <a href="<c:url value="/admin/freeBbsPostDetail?bbsNo=${post.bbsNo}" />">
+                                            ${post.bbsTitle}
+                                        </a>
+                                        <c:if test="${post.replyCount > 0}"><span class="badge bg-secondary ms-1">(${post.replyCount})</span></c:if>
+                                    </td>
+                                    <td>${post.bbsWriter}</td>
+                                    <td><fmt:formatDate value="${post.createDate}" pattern="yyyy-MM-dd" /></td>
+                                    <td>${post.bbsCount}</td>
+                                    <td class="action-cell">
+                                        <button class="btn btn-danger"
+                                            onclick="if(confirm('${post.bbsNo}번 게시글을 정말 삭제하시겠습니까?')) { location.href='<c:url value="/admin/deleteFreeBbsPost?bbsNo=${post.bbsNo}" />'; }">
+                                            삭제
+                                        </button>
+                                    </td>
+                                </tr>
+                            </c:forEach>
+                        </c:otherwise>
+                    </c:choose>
+                </tbody>
+            </table>
+
+            <div class="pagination-container">
+                <c:choose>
+                    <c:when test="${not empty searchKeyword}">
+                        <c:set var="pageLinkUrl" value="/admin/${searchCondition}" /><c:set var="searchQueryParam" value="&keyword=${searchKeyword}" />
+                    </c:when>
+                    <c:otherwise>
+                        <c:set var="pageLinkUrl" value="/admin/freeBbsManage" /><c:set var="searchQueryParam" value="" />
+                    </c:otherwise>
+                </c:choose>
+                <c:set var="pi" value="${pageInfo}" />
+                <c:choose><c:when test="${pi.currentPage le 1}"><span class="disabled">&lt;&lt;</span></c:when><c:otherwise><a href="<c:url value="${pageLinkUrl}" />?currentPage=1${searchQueryParam}">&lt;&lt
+                hiddenInput.value = checkbox.value;
+                form.appendChild(hiddenInput);
+            });
+            form.submit();
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const selectAllCheckbox = document.getElementById('selectAllCheckboxPost');
+        const itemCheckboxes = document.querySelectorAll('.itemCheckboxPost');
+        selectAllCheckbox.addEventListener('change', function() { itemCheckboxes.forEach(checkbox => { checkbox.checked = this.checked; }); });
+        itemCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                const checkedItems = document.querySelectorAll('.itemCheckboxPost:checked').length;
+                if (!checkbox.checked) { selectAllCheckbox.checked = false; } else if (checkedItems === itemCheckboxes.length) { selectAllCheckbox.checked = true; }
+            });
+        });
+    });
+ </script>
+</body>
+</html>

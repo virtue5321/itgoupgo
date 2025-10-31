@@ -1,0 +1,385 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>게시글 관리</title>
+  <%-- 💡 CSS 파일 경로 확인 (memberManage.jsp와 동일한 경로 사용) --%>
+  <link rel="stylesheet" href="<c:url value="/resources/css/adminStyle.css" />">
+  <%-- 💡 [추가] 아이콘 사용을 위한 Font Awesome CDN (회원 관리 UI와 일관성 유지) --%>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    /* 💡 [기존] 페이징바 스타일: UI를 깔끔하게 유지하기 위한 필수 스타일 */
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        padding: 20px 0;
+        gap: 5px;
+    }
+    .pagination-container a, .pagination-container span {
+        padding: 8px 12px;
+        text-decoration: none;
+        color: #333;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+    }
+    .pagination-container a:hover {
+        background-color: #f0f0f0;
+    }
+    .pagination-container .active {
+        background-color: #5a5ce8; /* 사용자님의 기존 버튼 색상 */
+        color: white;
+        border: 1px solid #5a5ce8;
+        font-weight: bold;
+    }
+    .list-table thead th:nth-child(5) { 
+        width: 30%; /* 제목 컬럼 너비 확보 */
+        text-align: left;
+        padding-left: 15px;
+    }
+    .list-table tbody td:nth-child(5) { 
+        text-align: left;
+        padding-left: 15px;
+    }
+
+    /* 💡 [추가] 검색 영역 스타일 (회원 관리 UI의 검색 박스 형태 모방) */
+    .search-area {
+        margin-bottom: 20px;
+    }
+    .search-area form {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        padding: 10px 15px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        background-color: #fff;
+    }
+    .search-area select {
+        padding: 8px 12px;
+        border: 1px solid #eee; /* 내부 테두리 약하게 */
+        border-radius: 4px;
+        margin-right: 10px;
+    }
+    .search-area input[type="text"] {
+        flex-grow: 1; /* 검색어 입력 필드가 남은 공간을 채우도록 */
+        padding: 8px 12px;
+        border: 1px solid #eee; 
+        border-radius: 4px;
+        margin-right: 10px;
+    }
+    .search-area .search-btn {
+        background-color: #5a5ce8; /* 파란색 버튼 */
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    .search-area .search-btn:hover {
+        background-color: #484acf;
+    }
+
+    /* 💡 [추가] 상단 정보 및 삭제 버튼 영역 스타일 (회원 관리 UI 레이아웃 맞춤) */
+    .top-info-area {
+        display: flex;
+        justify-content: space-between; /* 양 끝 정렬 */
+        align-items: center;
+        padding: 15px 0 10px 0;
+    }
+    .top-info-area p {
+        font-size: 1.0em;
+        font-weight: 500;
+        color: #555;
+    }
+    /* 일괄 삭제 버튼 스타일 (빨간색으로 변경하여 강조) */
+    .delete-btn {
+        background-color: #e85a5a; 
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.9em;
+        transition: background-color 0.3s;
+        box-shadow: 0 2px 4px rgba(232, 90, 90, 0.2);
+    }
+    .delete-btn:hover {
+        background-color: #cf4949;
+    }
+    /* 헤더 스타일 조정 */
+    .content h1 {
+        display: flex;
+        align-items: center;
+        font-size: 1.8em;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    .content h1 i {
+        margin-right: 10px;
+        color: #5a5ce8; /* 아이콘 색상 설정 */
+    }
+    .page-description {
+        margin-bottom: 20px;
+        color: #777;
+    }
+  </style>
+</head>
+<body>
+
+  <%-- 💡 전체 페이지 래퍼 --%>
+  <div class="wrap">
+    <%-- 💡 관리자 페이지 사이드바/헤더 등이 포함되는 영역 (여기서는 생략) --%>
+    
+    <div class="content">
+      
+      <%-- 💡 [수정] 회원 관리 UI와 유사하게 제목과 설명 영역을 구성 --%>
+      <h1><i class="fas fa-list-alt"></i> 게시글 관리</h1>
+      <p class="page-description">등록된 게시글 목록을 확인하고 관리할 수 있습니다.</p>
+
+      <%-- 1. 게시글 검색 영역 --%>
+      <div class="search-area">
+        <form action="<c:url value="/admin/postManage" />" method="get" id="searchForm">
+          <%-- 검색 기준 --%>
+          <select name="searchType" id="searchType">
+            <%-- 기존 검색 타입 유지 및 선택 상태 유지 로직 추가 --%>
+            <option value="title" <c:if test="${param.searchType eq 'title'}">selected</c:if>>제목</option>
+            <option value="content" <c:if test="${param.searchType eq 'content'}">selected</c:if>>내용</option>
+            <option value="author" <c:if test="${param.searchType eq 'author'}">selected</c:if>>작성자</option>
+            <option value="boardType" <c:if test="${param.searchType eq 'boardType'}">selected</c:if>>게시판 종류</option>
+          </select>
+          
+          <%-- 검색어 입력 --%>
+          <input type="text" name="keyword" placeholder="검색어를 입력하세요" value="${param.keyword}">
+          
+          <%-- 검색 버튼 --%>
+          <button type="submit" class="btn search-btn">검색</button>
+        </form>
+      </div>
+
+      <%-- 2. 전체 게시글 정보 및 일괄 삭제 버튼 영역 (회원 관리 UI처럼 좌우 정렬) --%>
+      <div class="top-info-area">
+        <p>
+          총 게시글 수: 
+          <%-- PageInfo 객체의 listCount 값을 사용한다고 가정 --%>
+          <strong><c:out value="${pi.listCount}" default="0"/></strong> 건
+        </p>
+        
+        <%-- 일괄 삭제 버튼 --%>
+        <button type="button" class="btn delete-btn" onclick="deletePost('<c:url value="/admin/deletePost" />');">
+          <i class="fas fa-trash-alt"></i> 선택 게시글 삭제
+        </button>
+      </div>
+
+      <%-- 3. 데이터 표시 테이블 --%>
+      <table class="list-table">
+        <thead>
+          <tr>
+            <th>
+              <input type="checkbox" id="selectAllCheckboxPost">
+            </th>
+            <th>번호</th>
+            <th>게시글 번호</th>
+            <th>게시판 종류</th>
+            <th>제목</th>
+            <th>작성자</th>
+            <th>작성일</th>
+            <th>조회수</th>
+            <th>상태</th>
+          </tr>
+        </thead>
+        <tbody>
+          <%-- 게시글 목록이 있을 경우 --%>
+          <c:choose>
+            <c:when test="${not empty postList}">
+              <%-- postList를 순회하며 데이터 출력 (게시글 번호는 내림차순으로 가정) --%>
+              <c:forEach var="post" items="${postList}" varStatus="status">
+                <tr>
+                  <td>
+                    <%-- 게시글 번호를 value로 사용 --%>
+                    <input type="checkbox" class="itemCheckboxPost" name="postNo" value="${post.postNo}">
+                  </td>
+                  <%-- 목록의 순서 번호 (listCount - offset - index) --%>
+                  <td><c:out value="${pi.listCount - pi.startList - status.index}" /></td>
+                  <%-- 게시글 번호 --%>
+                  <td><c:out value="${post.postNo}" /></td>
+                  
+                  <%-- 💡 게시판 종류 표시 (Controller에서 post 객체에 boardType 필드를 추가했다고 가정) --%>
+                  <td><c:out value="${post.boardType}" default="자유"/></td>
+                  
+                  <%-- 제목 (클릭 시 상세 페이지로 이동) --%>
+                  <td>
+                    <a href="<c:url value="/bbs/detail/${post.postNo}" />"><c:out value="${post.postTitle}" /></a>
+                  </td>
+                  
+                  <%-- 작성자 ID (memberId가 post 객체에 포함되어 있다고 가정) --%>
+                  <td><c:out value="${post.memberId}" default="탈퇴회원"/></td>
+                  
+                  <%-- 작성일 (날짜 포맷 적용) --%>
+                  <td><fmt:formatDate value="${post.postCreateDate}" pattern="yyyy.MM.dd"/></td>
+                  
+                  <%-- 조회수 --%>
+                  <td><c:out value="${post.postView}" default="0"/></td>
+                  
+                  <%-- 상태 (postDeleteStatus가 'Y'면 삭제됨, 'N'이면 정상으로 가정) --%>
+                  <td>
+                    <c:choose>
+                      <c:when test="${post.postDeleteStatus eq 'Y'}">
+                        <span style="color: red; font-weight: bold;">[삭제됨]</span>
+                      </c:when>
+                      <c:otherwise>
+                        <span style="color: green;">정상</span>
+                      </c:otherwise>
+                    </c:choose>
+                  </td>
+                </tr>
+              </c:forEach>
+            </c:when>
+            
+            <%-- 게시글 목록이 없을 경우 --%>
+            <c:otherwise>
+              <tr>
+                <td colspan="9" style="text-align: center; padding: 20px;">
+                  검색된 게시글이 없습니다.
+                </td>
+              </tr>
+            </c:otherwise>
+          </c:choose>
+        </tbody>
+      </table>
+
+      <%-- 4. 일괄 삭제 처리를 위한 숨겨진 폼 (memberManage.jsp와 동일한 구조) --%>
+      <form action="" method="post" id="deleteFormPost" style="display: none;">
+        <%-- Controller에서 postNoList라는 이름으로 List<Integer>를 받을 예정이라고 가정 --%>
+      </form>
+
+      <%-- 5. 페이징바 영역 (PageInfo 객체의 값을 사용한다고 가정) --%>
+      <div class="pagination-container">
+        
+        <%-- 맨 처음으로 (1페이지로 이동) --%>
+        <c:choose>
+          <c:when test="${pi.currentPage eq 1}">
+            <span>&lt;&lt;</span>
+          </c:when>
+          <c:otherwise>
+            <a href="<c:url value="/admin/postManage" />?currentPage=1&searchType=${param.searchType}&keyword=${param.keyword}">&lt;&lt;</a>
+          </c:otherwise>
+        </c:choose>
+
+        <%-- 이전 페이지로 (startPage - 1) --%>
+        <c:choose>
+          <c:when test="${pi.currentPage eq 1}">
+            <span>&lt;</span>
+          </c:when>
+          <c:otherwise>
+            <a href="<c:url value="/admin/postManage" />?currentPage=${pi.currentPage - 1}&searchType=${param.searchType}&keyword=${param.keyword}">&lt;</a>
+          </c:otherwise>
+        </c:choose>
+
+        <%-- 페이지 번호 목록 --%>
+        <c:forEach var="p" begin="${pi.startPage}" end="${pi.endPage}">
+          <c:choose>
+            <%-- 현재 페이지인 경우 --%>
+            <c:when test="${p eq pi.currentPage}">
+              <span class="active"><c:out value="${p}" /></span>
+            </c:when>
+            <%-- 다른 페이지인 경우 --%>
+            <c:otherwise>
+              <a href="<c:url value="/admin/postManage" />?currentPage=${p}&searchType=${param.searchType}&keyword=${param.keyword}"><c:out value="${p}" /></a>
+            </c:otherwise>
+          </c:choose>
+        </c:forEach>
+        
+        <%-- 다음 페이지로 (endPage + 1 또는 maxPage) --%>
+        <c:choose>
+          <c:when test="${pi.currentPage eq pi.maxPage}">
+            <span>&gt;</span>
+          </c:when>
+          <c:otherwise>
+            <a href="<c:url value="/admin/postManage" />?currentPage=${pi.currentPage + 1}&searchType=${param.searchType}&keyword=${param.keyword}">&gt;</a>
+          </c:otherwise>
+        </c:choose>
+
+        <%-- 맨 끝으로 (maxPage로 이동) --%>
+        <c:choose>
+          <c:when test="${pi.currentPage eq pi.maxPage}">
+            <span>&gt;&gt;</span>
+          </c:when>
+          <c:otherwise>
+            <a href="<c:url value="/admin/postManage" />?currentPage=${pi.maxPage}&searchType=${param.searchType}&keyword=${param.keyword}">&gt;&gt;</a>
+          </c:otherwise>
+        </c:choose>
+      </div>
+
+    </div> <%-- end of content --%>
+  </div> <%-- end of wrap --%>
+
+  <script>
+    // 1. 게시글 일괄 삭제 기능 함수
+    function deletePost(url) {
+        const form = document.getElementById('deleteFormPost');
+        const selectedCheckboxes = document.querySelectorAll('.itemCheckboxPost:checked');
+
+        if (selectedCheckboxes.length === 0) {
+            // 🚨 [규정 준수] window.alert() 사용 금지 -> 커스텀 모달로 대체 필요
+            console.warn("선택된 게시글이 없습니다. (TODO: 커스텀 모달로 메시지 표시)");
+            return;
+        }
+
+        // 🚨 [규정 준수] window.confirm() 사용 금지 -> 커스텀 모달로 대체 필요
+        console.log(`선택된 게시글 ${selectedCheckboxes.length}개를 삭제 요청합니다. (TODO: 커스텀 모달로 확인 단계 구현)`);
+        
+        // **임시 확인 로직:** 실제 구현에서는 사용자 정의 모달을 통해 확인 단계를 구현해야 합니다.
+        // 현재는 선택된 항목이 있을 경우 항상 진행한다고 가정합니다.
+        
+        form.action = url; // POST 요청 URL 설정
+        
+        // 이전에 추가된 hidden input이 있다면 제거
+        while (form.firstChild) {
+            form.removeChild(form.firstChild);
+        }
+
+        // 선택된 체크박스의 value를 hidden input으로 폼에 추가하여 전송
+        selectedCheckboxes.forEach(checkbox => {
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'postNoList'; // Controller의 @RequestParam 이름과 일치
+            hiddenInput.value = checkbox.value;
+            form.appendChild(hiddenInput);
+        });
+        
+        form.submit(); // POST 요청 전송
+    }
+
+    // 2. 체크박스 전체 선택/해제 기능
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const selectAllCheckbox = document.getElementById('selectAllCheckboxPost');
+        const itemCheckboxes = document.querySelectorAll('.itemCheckboxPost');
+
+        selectAllCheckbox.addEventListener('change', function() {
+            itemCheckboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+        });
+        
+        itemCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                const checkedItems = document.querySelectorAll('.itemCheckboxPost:checked').length;
+                if (!checkbox.checked) {
+                    // 하나라도 해제되면 전체 선택 체크박스 해제
+                    selectAllCheckbox.checked = false;
+                } else if (checkedItems === itemCheckboxes.length) {
+                    // 모든 개별 항목이 선택되면 전체 선택 체크박스 선택
+                    selectAllCheckbox.checked = true;
+                }
+            });
+        });
+    });
+ </script>
+</body>
+</html>

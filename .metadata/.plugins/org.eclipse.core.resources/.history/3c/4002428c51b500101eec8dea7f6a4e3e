@@ -1,0 +1,88 @@
+package com.itgoupgo.community.info.model.service;
+
+import java.util.List;
+
+import org.apache.ibatis.session.RowBounds;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.itgoupgo.community.info.model.dao.InfoDao;
+import com.itgoupgo.community.info.model.vo.InfoBbs;
+
+public class InfoService {
+	
+	@Autowired
+	private SqlSessionTemplate sqlSession; // MyBatis 쿼리 실행을 위한 SqlSessionTemplate
+	
+	@Autowired
+	private InfoDao infoDao; // 데이터베이스 접근을 위한 DAO 주입
+
+    // 게시글 목록 페이징 처리를 위한 상수 설정 (일반적으로 별도의 VO/클래스에서 관리됨)
+    private static final int BOARD_LIMIT = 10; 
+	
+	/**
+	 * 전체 게시글 개수 조회
+	 * @return 전체 게시글 수
+	 */
+	public int selectListCount() {
+		return infoDao.selectListCount(sqlSession);
+	}
+	
+	/**
+	 * 게시글 목록 조회 (페이징 적용)
+	 * @param currentPage 현재 페이지 번호
+	 * @return 현재 페이지에 해당하는 게시글 목록
+	 */
+	public List<InfoBbs> selectList(int currentPage) {
+        // 페이징 처리를 위한 offset 계산
+        int offset = (currentPage - 1) * BOARD_LIMIT;
+        
+        // RowBounds 객체 생성 (offset: 건너뛸 행 수, limit: 가져올 행 수)
+        RowBounds rowBounds = new RowBounds(offset, BOARD_LIMIT);
+        
+		return infoDao.selectList(sqlSession, rowBounds);
+	}
+
+    /**
+     * 게시글 상세 조회 및 조회수 증가 처리 (트랜잭션 적용)
+     * 조회수 증가와 게시글 조회가 하나의 단위 작업으로 묶여야 함 (둘 중 하나라도 실패하면 롤백)
+     * @param 조회할 게시글 번호
+     * @return 조회된 FreeBbs 객체
+     */
+    @Transactional
+    public InfoBbs selectInfoBbs(int infoNo) {
+        
+        // 1. 조회수 증가
+        int result = infoDao.increaseInfoBbsCount(sqlSession, infoNo);
+        
+        InfoBbs info = null;
+        
+        // 2. 조회수 증가 성공 시 게시글 조회
+        if(result > 0) {
+            info = infoDao.selectInfoBbs(sqlSession, infoNo);
+        }
+        
+        return info; // 게시글 조회 실패 시 (result == 0 또는 DB 오류) null 반환
+    }
+
+    /**
+     * 새로운 게시글 등록 (트랜잭션 적용)
+     * @param  등록할 객체
+     * @return 처리된 행의 수
+     */
+    @Transactional
+    public int insertInfoBbs(InfoBbs info) {
+        return infoDao.insertInfoBbs(sqlSession, info);
+    }
+    
+    /**
+     * 게시글 삭제 (삭제 상태 업데이트) (트랜잭션 적용)
+     * @param 삭제할 게시글 번호
+     * @return 처리된 행의 수
+     */
+    @Transactional
+    public int deleteInfoBbs(int infoNo) {
+        return infoDao.deleteInfoBbs(sqlSession, infoNo);
+    }
+}

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 페이지 사이드바</title>
+    <!-- Tailwind CSS CDN 로드 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 커스텀 스타일 및 폰트 설정 */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f9;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- 사이드바 레이아웃 (데스크톱 기준) -->
+    <div class="flex h-screen">
+        
+        <!-- 관리자 사이드바 영역 -->
+        <aside class="w-64 bg-gray-800 text-white shadow-xl fixed h-full transition-transform duration-300 transform md:translate-x-0 -translate-x-full" id="sidebar">
+            <div class="p-6">
+                <h1 class="text-2xl font-bold text-indigo-400">ADMIN DASHBOARD</h1>
+            </div>
+            
+            <nav class="mt-8">
+                <ul class="space-y-2 px-4">
+                    
+                    <!-- 일반 메뉴 항목 (예시) -->
+                    <li class="rounded-lg hover:bg-gray-700 transition duration-150">
+                        <a href="/admin/dashboard" class="flex items-center p-3 text-sm font-medium">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                            대시보드
+                        </a>
+                    </li>
+                    
+                    <!-- 회원 관리 메뉴 항목 (예시) -->
+                    <li class="rounded-lg hover:bg-gray-700 transition duration-150">
+                        <a href="/admin/member" class="flex items-center p-3 text-sm font-medium">
+                             <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                            회원 관리
+                        </a>
+                    </li>
+
+                    <!-- **** 요청하신 게시글 관리 드롭다운 메뉴 **** -->
+                    <li class="rounded-lg transition duration-150" id="board-management-menu">
+                        <!-- 드롭다운 토글 버튼 역할 (클릭 시 하위 메뉴 표시) -->
+                        <div class="flex items-center p-3 text-sm font-medium cursor-pointer bg-gray-700 text-indigo-300 rounded-lg hover:bg-gray-600 transition duration-150" onclick="toggleSubMenu()">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                            게시글 관리
+                            <!-- 드롭다운 상태를 나타내는 아이콘 -->
+                            <span id="dropdown-icon" class="ml-auto transform transition-transform duration-200">
+                                <!-- 기본: 아래 화살표 -->
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </span>
+                        </div>
+                        
+                        <!-- 하위 게시판 관리 목록 (초기에는 보이도록 설정) -->
+                        <ul id="board-submenu" class="ml-4 mt-1 border-l border-gray-600 transition-all duration-300 overflow-hidden" style="max-height: 500px; opacity: 1;"> 
+                            <!-- 공지사항 관리 -->
+                            <li class="rounded-r-lg hover:bg-gray-700 transition duration-150">
+                                <!-- 실제 관리 페이지로 이동하는 링크 -->
+                                <a href="/admin/bbs/notice" class="block p-2 pl-6 text-xs text-gray-300 hover:text-white">공지사항 관리</a>
+                            </li>
+                            <!-- IT뉴스 관리 -->
+                            <li class="rounded-r-lg hover:bg-gray-700 transition duration-150">
+                                <a href="/admin/bbs/it" class="block p-2 pl-6 text-xs text-gray-300 hover:text-white">IT뉴스 관리</a>
+                            </li>
+                            <!-- 스터디모집 관리 -->
+                            <li class="rounded-r-lg hover:bg-gray-700 transition duration-150">
+                                <a href="/admin/bbs/study" class="block p-2 pl-6 text-xs text-gray-300 hover:text-white">스터디모집 관리</a>
+                            </li>
+                            <!-- 정보공유 관리 -->
+                            <li class="rounded-r-lg hover:bg-gray-700 transition duration-150">
+                                <a href="/admin/bbs/info" class="block p-2 pl-6 text-xs text-gray-300 hover:text-white">정보공유 관리</a>
+                            </li>
+                             <!-- 자유게시판 관리 -->
+                            <li class="rounded-r-lg hover:bg-gray-700 transition duration-150">
+                                <a href="/admin/bbs/free" class="block p-2 pl-6 text-xs text-gray-300 hover:text-white">자유게시판 관리</a>
+                            </li>
+                             <!-- 지식공유 관리 -->
+                            <li class="rounded-r-lg hover:bg-gray-700 transition duration-150">
+                                <a href="/admin/bbs/knowledge" class="block p-2 pl-6 text-xs text-gray-300 hover:text-white">지식공유 관리</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- **** 요청하신 게시글 관리 드롭다운 메뉴 끝 **** -->
+
+                    <!-- 기타 메뉴 항목 (예시) -->
+                    <li class="rounded-lg hover:bg-gray-700 transition duration-150">
+                        <a href="/admin/stats" class="flex items-center p-3 text-sm font-medium">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l2-2m2 2l2-2m2 2l2-2M9 10h6M17 14h2"></path></svg>
+                            통계 분석
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- 메인 콘텐츠 영역 -->
+        <main class="flex-1 p-8 md:ml-64 transition-all duration-300">
+            <h2 class="text-3xl font-semibold text-gray-800">관리자 페이지 - 게시글 관리</h2>
+            <p class="mt-4 text-gray-600">왼쪽 메뉴에서 드롭다운 기능을 확인해 보세요. 각 게시판 관리 링크를 클릭하면 해당 페이지로 이동합니다.</p>
+            
+            <div class="mt-8 p-6 bg-white rounded-xl shadow-lg">
+                <p class="text-lg font-medium text-gray-700">현재 페이지: 게시글 관리 메인</p>
+                <p class="mt-2 text-sm text-gray-500">이 영역은 클릭한 하위 메뉴에 따라 내용이 변경되는 부분입니다. (실제 서버 라우팅 필요)</p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 드롭다운 메뉴 토글 함수
+        function toggleSubMenu() {
+            const submenu = document.getElementById('board-submenu');
+            const icon = document.getElementById('dropdown-icon');
+            
+            // 현재 상태가 펼쳐져 있는지 (max-height가 설정되어 있는지) 확인
+            const isExpanded = submenu.style.maxHeight !== '0px';
+
+            if (isExpanded) {
+                // 닫기
+                submenu.style.maxHeight = '0';
+                submenu.style.opacity = '0';
+                icon.style.transform = 'rotate(0deg)'; // 아래 화살표
+            } else {
+                // 펼치기
+                // max-height를 충분히 큰 값으로 설정하여 부드러운 애니메이션 구현
+                submenu.style.maxHeight = submenu.scrollHeight + 'px'; 
+                submenu.style.opacity = '1';
+                icon.style.transform = 'rotate(180deg)'; // 위 화살표
+            }
+        }
+        
+        // 페이지 로드 시 드롭다운 메뉴의 초기 상태 설정
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const submenu = document.getElementById('board-submenu');
+            
+            // 초기 상태를 펼쳐진 상태로 시작하고, 이후 토글 함수가 작동하도록 설정
+            // max-height를 실제 컨텐츠 높이로 설정하여 초기 애니메이션을 준비합니다.
+            submenu.style.maxHeight = submenu.scrollHeight + 'px';
+            submenu.style.opacity = '1';
+
+            // 참고: 만약 초기 상태를 닫힌 상태로 원한다면, 아래 두 줄을 사용하세요:
+            /*
+            submenu.style.maxHeight = '0px';
+            submenu.style.opacity = '0';
+            */
+            
+        });
+    </script>
+</body>
+</html>

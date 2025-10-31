@@ -1,0 +1,34 @@
+// com.itgoupgo.community.common.template.Pagination.java
+public class Pagination {
+    
+    // PageInfo 객체를 생성하여 반환하는 정적 메소드
+    public static PageInfo getPageInfo(int listCount, int currentPage, int boardLimit, int pageLimit) {
+        
+        int maxPage;        // 가장 마지막 페이지 수
+        int startPage;      // 페이징바의 시작 수
+        int endPage;        // 페이징바의 끝 수
+        
+        // 🚨 [핵심 수정] maxPage 계산 시, 하드코딩된 5 대신 boardLimit(10)을 사용해야 합니다.
+        // ex) (22.0 / 10) = 2.2 -> 3
+        maxPage = (int)Math.ceil((double)listCount / boardLimit); 
+
+        // 🚨 [오류 원인 추정] 만약 기존 코드가 다음과 같았다면, 5명씩 계산되어 문제가 발생합니다.
+        // maxPage = (int)Math.ceil((double)listCount / 5); // ⬅️ 이 코드가 문제의 원인일 수 있습니다.
+
+        // startPage 계산
+        // ex) 현재 페이지: 6, pageLimit: 5 -> 6/5 = 1.xx -> 1.xx * 5 + 1 = 6
+        startPage = (currentPage - 1) / pageLimit * pageLimit + 1;
+        
+        // endPage 계산
+        // ex) startPage: 6, pageLimit: 5 -> 6 + 5 - 1 = 10
+        endPage = startPage + pageLimit - 1;
+        
+        // endPage가 maxPage보다 클 경우, endPage를 maxPage로 설정
+        if(endPage > maxPage) {
+            endPage = maxPage;
+        }
+        
+        // PageInfo 객체 생성 및 반환
+        return new PageInfo(listCount, currentPage, boardLimit, pageLimit, maxPage, startPage, endPage);
+    }
+}

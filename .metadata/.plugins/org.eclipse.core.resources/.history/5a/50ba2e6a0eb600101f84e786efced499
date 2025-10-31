@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="adminMapper">
+	
+	<resultMap id="memberResultSet" type="member">
+		<id column="MEMBER_NO" property="memberNo" />
+		<result column="MEMBER_ID" property="memberId" />
+		<result column="MEMBER_PWD" property="memberPwd" />
+		<result column="MEMBER_NAME" property="memberName" />
+		<result column="MEMBER_NICK" property="memberNick" />
+		<result column="MEMBER_BIRTH_DATE" property="memberBirthDate" />
+		<result column="GENDER" property="gender" />
+		<result column="EMAIL" property="email" />
+		<result column="PHONE" property="phone" />
+		<result column="ENROLL_DATE" property="enrollDate" />
+		<result column="MEMBER_STATUS" property="memberStatus" />
+	</resultMap>
+	
+	<resultMap id="freeResultSet" type="free">
+		<id column="FREE_NO" property="freeNo" />
+		<result column="FREE_TITLE" property="freeTitle" />
+		<result column="FREE_CONTENT" property="freeContent" />
+		<result column="FREE_CREATE_DATE" property="freeCreateDate" />
+		<result column="FREE_VIEW" property="freeView" />
+		<result column="FREE_DELETE_STATUS" property="freeDeleteStatus" />
+		<result column="MEMBER_NO" property="memberNo" />
+		<result column="MEMBER_NICK" property="memberNick" />
+    </resultMap>
+    
+    <resultMap id="infoResultSet" type="info">
+		<id column="INFO_NO" property="infoNo" />
+		<result column="INFO_TITLE" property="infoTitle" />
+		<result column="INFO_CONTENT" property="infoContent" />
+		<result column="INFO_CREATE_DATE" property="infoCreateDate" />
+		<result column="INFO_VIEW" property="infoView" />
+		<result column="INFO_CATEGORY" property="infoCategory" /> <!-- 새로운 필드 추가 -->
+		<result column="INFO_DELETE_STATUS" property="infoDeleteStatus" />
+		<result column="MEMBER_NO" property="memberNo" />
+		<result column="MEMBER_NICK" property="memberNick" />
+    </resultMap>
+    
+    <resultMap id="itResultSet" type="it">
+    	<id column="IT_NO" property="itNo" />
+    	<result column="IT_TITLE" property="itTitle" />
+    	<result column="THUMBNAIL" property="thumnail" />
+    	<result column="IT_CONTENT" property="itContent" />
+    	<result column="REPORTER" property="reporter" />
+    	<result column="NEWSPAPER" property="newspaper" />
+    	<result column="IT_CREATE_DATE" property="itCreateDate" />
+    	<result column="IT_VIEW" property="itView" />
+    	<result column="IT_DELETE_STATUS" property="itDeleteStatus" />
+    	<result column="MEMBER_NICK" property="memberNick" />
+    </resultMap>
+    
+    <resultMap id="knowledgeResultSet" type="knowledge">
+    	<id column="KNOWLEDGE_NO" property="knowledgeNo" />
+    	<result column="KNOWLEDGE_TITLE" property="knowledgeTitle" />
+    	<result column="KNOWLEDGE_CONTENT" property="knowledgeContent" />
+    	<result column="KNOWLEDGE_CREATE_DATE" property="knowledgeCreateDate" />
+    	<result column="KNOWLEDGE_VIEW" property="knowledgeView" />
+    	<result column="KNOWLEDGE_CATEGORY" property="knowledgeCategory" />
+    	<result column="KNOWLEDGE_DELETE_STATUS" property="knowledgeDeleteStatus" />
+    	<result column="MEMBER_NO" property="memberNo" />
+    	<result column="MEMBER_NICK" property="memberNick" />
+    </resultMap>
+    
+    <resultMap id="studyResultSet" type="study">
+		<id column="STUDY_NO" property="studyNo" />
+		<result column="STUDY_TITLE" property="studyTitle" />
+		<result column="STUDY_CONTENT" property="studyContent" />
+		<result column="STUDY_CREATE_DATE" property="studyCreateDate" />
+		<result column="STUDY_VIEW" property="studyView" />
+		<result column="STUDY_CATEGORY" property="studyCategory" /> <!-- 새로운 필드 추가 -->
+		<result column="STUDY_DELETE_STATUS" property="studyDeleteStatus" />
+		<result column="MEMBER_NO" property="memberNo" />
+		<result column="MEMBER_NICK" property="memberNick" />
+    </resultMap>
+    
+    <resultMap id="noticeResultSet" type="notice">
+    </resultMap>
+	
+	<select id="selectMemberList" resultMap="memberResultSet">
+		SELECT
+			MEMBER_NO,
+			MEMBER_ID,
+			MEMBER_NAME,
+			GENDER,
+			PHONE,
+			EMAIL,
+			ENROLL_DATE,
+			MEMBER_STATUS
+		FROM MEMBER
+		ORDER BY ENROLL_DATE DESC
+	</select>
+	
+	<update id="deleteMemberAdmin" parameterType="string">
+		UPDATE MEMBER
+		   SET MEMBER_STATUS = 'N'
+		 WHERE MEMBER_ID = #{memberId}
+		   AND MEMBER_STATUS = 'Y'
+	</update>
+	
+	<update id="deleteCheckMember" parameterType="java.util.List">
+        UPDATE MEMBER
+           SET MEMBER_STATUS = 'N'
+         WHERE MEMBER_NO IN
+        <foreach collection="list" item="memberNo" open="(" separator="," close=")">
+            #{memberNo}
+        </foreach>
+           AND MEMBER_STATUS = 'Y'
+    </update>
+	
+	<select id="searchMemberByName" resultMap="memberResultSet">
+		SELECT
+			MEMBER_NO,
+			MEMBER_ID,
+			MEMBER_NAME,
+			GENDER,
+			PHONE,
+			EMAIL,
+			ENROLL_DATE,
+			MEMBER_STATUS
+		  FROM MEMBER
+		 WHERE MEMBER_NAME LIKE '%' || #{memberName} || '%' 
+	</select>
+	
+	<select id="searchMemberById" resultMap="memberResultSet">
+		SELECT
+			MEMBER_NO,
+			MEMBER_ID,
+			MEMBER_NAME,
+			GENDER,
+			PHONE,
+			EMAIL,
+			ENROLL_DATE,
+			MEMBER_STATUS
+		  FROM MEMBER
+		 WHERE MEMBER_ID = #{memberId}
+	</select>
+	
+	<select id="selectMemberDetail" resultMap="memberResultSet" parameterType="_int">
+	    SELECT
+	        *
+	    FROM MEMBER
+	    WHERE MEMBER_NO = #{memberNo}
+	</select>
+	
+	<select id="selectListCount" resultType="_int">
+        SELECT COUNT(*) FROM MEMBER
+    </select>
+    
+    <select id="selectFreeListCount" resultType="_int">
+        SELECT COUNT(*) FROM FREE_BBS 
+    </select>
+
+	<!-- ✅ 자유 게시판 -->
+    <select id="selectFreeList" resultMap="freeResultSet">
+    	SELECT 
+            T1.FREE_NO,
+            T1.FREE_TITLE,
+            T2.MEMBER_NICK,
+            T1.FREE_CREATE_DATE,
+            T1.FREE_VIEW,
+            T1.FREE_DELETE_STATUS, T1.MEMBER_NO
+          FROM FREE_BBS T1
+          JOIN MEMBER T2 ON T1.MEMBER_NO = T2.MEMBER_NO  ORDER BY T1.FREE_NO DESC
+    </select>
+    
+    <update id="deleteFreeBbs" parameterType="_int">
+    	UPDATE FREE_BBS
+    	   SET FREE_DELETE_STATUS = 'Y'
+    	 WHERE FREE_NO = #{bbsNo}
+    	   AND FREE_DELETE_STATUS = 'N'
+    </update>
+
+    <update id="deleteFreeBbsCheck" parameterType="list">
+    	UPDATE FREE_BBS
+    	   SET FREE_DELETE_STATUS = 'Y'
+    	 WHERE FREE_NO IN
+    	 <foreach collection="list" item="bbsNo" open="(" separator="," close=")">
+    	 	#{bbsNo}
+    	 </foreach>
+    	   AND FREE_DELETE_STATUS = 'N'
+    </update>
+    
+    
+    <!-- ✅ 정보 공유 게시판 -->
+    <select id="selectInfoListCount" resultType="_int">
+        SELECT COUNT(*) FROM INFO_BBS 
+    </select>
+    
+    <select id="selectInfoList" resultMap="infoResultSet">
+    	SELECT 
+            T1.INFO_NO,
+            T1.INFO_TITLE,
+            T2.MEMBER_NICK,
+            T1.INFO_CREATE_DATE,
+            T1.INFO_VIEW,
+            T1.INFO_CATEGORY, <!-- INFO_CATEGORY 추가 -->
+            T1.INFO_DELETE_STATUS, T1.MEMBER_NO
+          FROM INFO_BBS T1
+          JOIN MEMBER T2 ON T1.MEMBER_NO = T2.MEMBER_NO  
+          ORDER BY T1.INFO_NO DESC
+    </select>
+    
+    <update id="deleteInfoBbs" parameterType="_int">
+    	UPDATE INFO_BBS
+    	   SET INFO_DELETE_STATUS = 'Y'
+    	 WHERE INFO_NO = #{infoNo} <!-- BBS_NO -> INFO_NO 로 수정 -->
+    	   AND INFO_DELETE_STATUS = 'N'
+    </update>
+
+    <update id="deleteInfoBbsCheck" parameterType="list">
+    	UPDATE INFO_BBS
+    	   SET INFO_DELETE_STATUS = 'Y'
+    	 WHERE INFO_NO IN <!-- BBS_NO -> INFO_NO 로 수정 -->
+    	 <foreach collection="list" item="infoNo" open="(" separator="," close=")">
+    	 	#{infoNo}
+    	 </foreach>
+    	   AND INFO_DELETE_STATUS = 'N'
+    </update>
+    
+    <!-- ✅ IT 뉴스 게시판 -->
+    <select id="selectItListCount" resultType="_int">
+        SELECT COUNT(*) FROM IT_BBS 
+    </select>
+    
+    <select id="selectItList" resultMap="itResultSet">
+    	SELECT
+    </select>
+    
+</mapper>

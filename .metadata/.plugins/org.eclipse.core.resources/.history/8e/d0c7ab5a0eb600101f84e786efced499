@@ -1,0 +1,82 @@
+package com.itgoupgo.community.notice.model.vo;
+
+import java.sql.Date;
+
+public class NoticeBbs {
+
+	private int noticeNo; // NOTICE_NO	NUMBER
+	private String noticeTitle; // NOTICE_TITLE	VARCHAR2(100 BYTE)
+	private String noticeContent; // NOTICE_CONTENT	VARCHAR2(4000 BYTE)
+	private Date noticeCreateDate; // NOTICE_CREATE_DATE	DATE
+	private int noticeView; // NOTICE_VIEW	NUMBER
+	private String noticeDeleteStatus; // NOTICE_DELETE_STATUS	CHAR(1 BYTE)
+	
+	public NoticeBbs() {}
+
+	public NoticeBbs(int noticeNo, String noticeTitle, String noticeContent, Date noticeCreateDate, int noticeView,
+			String noticeDeleteStatus) {
+		super();
+		this.noticeNo = noticeNo;
+		this.noticeTitle = noticeTitle;
+		this.noticeContent = noticeContent;
+		this.noticeCreateDate = noticeCreateDate;
+		this.noticeView = noticeView;
+		this.noticeDeleteStatus = noticeDeleteStatus;
+	}
+
+	public int getNoticeNo() {
+		return noticeNo;
+	}
+
+	public void setNoticeNo(int noticeNo) {
+		this.noticeNo = noticeNo;
+	}
+
+	public String getNoticeTitle() {
+		return noticeTitle;
+	}
+
+	public void setNoticeTitle(String noticeTitle) {
+		this.noticeTitle = noticeTitle;
+	}
+
+	public String getNoticeContent() {
+		return noticeContent;
+	}
+
+	public void setNoticeContent(String noticeContent) {
+		this.noticeContent = noticeContent;
+	}
+
+	public Date getNoticeCreateDate() {
+		return noticeCreateDate;
+	}
+
+	public void setNoticeCreateDate(Date noticeCreateDate) {
+		this.noticeCreateDate = noticeCreateDate;
+	}
+
+	public int getNoticeView() {
+		return noticeView;
+	}
+
+	public void setNoticeView(int noticeView) {
+		this.noticeView = noticeView;
+	}
+
+	public String getNoticeDeleteStatus() {
+		return noticeDeleteStatus;
+	}
+
+	public void setNoticeDeleteStatus(String noticeDeleteStatus) {
+		this.noticeDeleteStatus = noticeDeleteStatus;
+	}
+
+	@Override
+	public String toString() {
+		return "NoticeBbs [noticeNo=" + noticeNo + ", noticeTitle=" + noticeTitle + ", noticeContent=" + noticeContent
+				+ ", noticeCreateDate=" + noticeCreateDate + ", noticeView=" + noticeView + ", noticeDeleteStatus="
+				+ noticeDeleteStatus + "]";
+	}
+	
+}

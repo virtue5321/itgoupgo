@@ -1,0 +1,133 @@
+package com.itgoupgo.community.it.model.vo;
+
+import java.sql.Date;
+
+public class ItBbs {
+	private int itNo; // IT_NO	NUMBER
+	private String itTitle; // IT_TITLE	VARCHAR2(100 BYTE)
+	private String thumbnail; // THUMBNAIL	VARCHAR2(500 BYTE)
+	private String itContent; // IT_CONTENT	VARCHAR2(4000 BYTE)
+	private String reporter; // REPORTER	VARCHAR2(15 BYTE)
+	private String newsPaper; // NEWSPAPER	VARCHAR2(30 BYTE)
+	private Date itCreateDate; // IT_CREATE_DATE	DATE
+	private int itView; // IT_VIEW	NUMBER
+	private String itDeleteStatus; // IT_DELETE_STATUS	CHAR(1 BYTE)
+	private String memberNo;
+	private String memberNick;
+
+
+	public ItBbs() {}
+	
+	public ItBbs(int itNo, String itTitle, String thumbnail, String itContent, String reporter, String newsPaper,
+			Date itCreateDate, int itView, String itDeleteStatus, String memberNo, String memberNick) {
+		super();
+		this.itNo = itNo;
+		this.itTitle = itTitle;
+		this.thumbnail = thumbnail;
+		this.itContent = itContent;
+		this.reporter = reporter;
+		this.newsPaper = newsPaper;
+		this.itCreateDate = itCreateDate;
+		this.itView = itView;
+		this.itDeleteStatus = itDeleteStatus;
+		this.memberNo = memberNo;
+		this.memberNick = memberNick;
+	}
+
+	public int getItNo() {
+		return itNo;
+	}
+
+	public void setItNo(int itNo) {
+		this.itNo = itNo;
+	}
+
+	public String getItTitle() {
+		return itTitle;
+	}
+
+	public void setItTitle(String itTitle) {
+		this.itTitle = itTitle;
+	}
+
+	public String getThumbnail() {
+		return thumbnail;
+	}
+
+	public void setThumbnail(String thumbnail) {
+		this.thumbnail = thumbnail;
+	}
+
+	public String getItContent() {
+		return itContent;
+	}
+
+	public void setItContent(String itContent) {
+		this.itContent = itContent;
+	}
+
+	public String getReporter() {
+		return reporter;
+	}
+
+	public void setReporter(String reporter) {
+		this.reporter = reporter;
+	}
+
+	public String getNewsPaper() {
+		return newsPaper;
+	}
+
+	public void setNewsPaper(String newsPaper) {
+		this.newsPaper = newsPaper;
+	}
+
+	public Date getItCreateDate() {
+		return itCreateDate;
+	}
+
+	public void setItCreateDate(Date itCreateDate) {
+		this.itCreateDate = itCreateDate;
+	}
+
+	public int getItView() {
+		return itView;
+	}
+
+	public void setItView(int itView) {
+		this.itView = itView;
+	}
+
+	public String getItDeleteStatus() {
+		return itDeleteStatus;
+	}
+
+	public void setItDeleteStatus(String itDeleteStatus) {
+		this.itDeleteStatus = itDeleteStatus;
+	}
+	
+	public String getMemberNick() {
+		return memberNick;
+	}
+
+	public void setMemberNick(String memberNick) {
+		this.memberNick = memberNick;
+	}
+
+	public String getMemberNo() {
+		return memberNo;
+	}
+
+	public void setMemberNo(String memberNo) {
+		this.memberNo = memberNo;
+	}
+
+	@Override
+	public String toString() {
+		return "ItBbs [itNo=" + itNo + ", itTitle=" + itTitle + ", thumbnail=" + thumbnail + ", itContent=" + itContent
+				+ ", reporter=" + reporter + ", newsPaper=" + newsPaper + ", itCreateDate=" + itCreateDate + ", itView="
+				+ itView + ", itDeleteStatus=" + itDeleteStatus + "]";
+	}
+	
+	
+}

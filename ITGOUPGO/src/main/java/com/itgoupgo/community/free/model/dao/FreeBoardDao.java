@@ -1,0 +1,38 @@
+package com.itgoupgo.community.free.model.dao;
+
+import java.util.HashMap;
+import java.util.List;
+
+import org.apache.jasper.compiler.PageInfo;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import com.itgoupgo.community.free.model.vo.FreeBbs;
+
+@Repository
+public class FreeBoardDao {
+
+    @Autowired
+    private SqlSessionTemplate sqlSession;
+    
+    // 1. 자유게시글 총 개수 조회
+    public int getListCount() {
+        return sqlSession.selectOne("freeBoardMapper.getListCount");
+    }
+
+    // 2. 전체 자유 게시글 목록 조회
+    public List<FreeBbs> selectFreeBoardList(PageInfo pi) {
+        return sqlSession.selectList("freeBoardMapper.selectFreeBoardList", pi);
+    }
+
+    // 3. 검색된 자유게시글 개수 조회 (Mapper ID 수정 및 파라미터 전달)
+    public int getSearchCount(HashMap<String, String> map) {
+        return sqlSession.selectOne("freeBoardMapper.getSearchCount", map);
+    }
+
+    // 4. 검색된 자유게시글 목록 조회
+    public List<FreeBbs> selectSearchList(HashMap<String, Object> map) {
+        return sqlSession.selectList("freeBoardMapper.selectSearchList", map);
+    }
+}

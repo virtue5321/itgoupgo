@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-ItgoupgoCommunityApplication<community>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.itgoupgo.community.ItgoupgoCommunityApplication",
+            "projectName": "community",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

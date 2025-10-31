@@ -1,0 +1,35 @@
+package com.itgoupgo.community.it.model.vo;
+
+import java.sql.Date;
+
+public class ItBbs {
+	private int itNo; // IT_NO	NUMBER
+	private String itTitle; // IT_TITLE	VARCHAR2(100 BYTE)
+	private String thumbnail; // THUMBNAIL	VARCHAR2(500 BYTE)
+	private String itContent; // IT_CONTENT	VARCHAR2(4000 BYTE)
+	private String reporter; // REPORTER	VARCHAR2(15 BYTE)
+	private String newsPaper; // NEWSPAPER	VARCHAR2(30 BYTE)
+	private Date itCreateDate; // IT_CREATE_DATE	DATE
+	private int itView; // IT_VIEW	NUMBER
+	private String itDeleteStatus; // IT_DELETE_STATUS	CHAR(1 BYTE)
+	
+	public ItBbs() {}
+	
+	public ItBbs(int itNo, String itTitle, String thumbnail, String itContent, String reporter, String newsPaper,
+			Date itCreateDate, int itView, String itDeleteStatus) {
+		super();
+		this.itNo = itNo;
+		this.itTitle = itTitle;
+		this.thumbnail = thumbnail;
+		this.itContent = itContent;
+		this.reporter = reporter;
+		this.newsPaper = newsPaper;
+		this.itCreateDate = itCreateDate;
+		this.itView = itView;
+		this.itDeleteStatus = itDeleteStatus;
+	}
+	
+	
+	
+	
+}

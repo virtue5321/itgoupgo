@@ -1,0 +1,155 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
+<!DOCTYPE html>
+
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>관리자 - 지식인 게시판 관리</title>
+<link rel="stylesheet" href="<c:url value="/resources/css/adminStyle.css" />">
+<style>
+/* 💡 스타일은 noticeManage.jsp와 동일합니다 */
+.pagination-container {
+display: flex;
+justify-content: center;
+padding: 20px 0;
+gap: 5px;
+}
+.pagination-container a, .pagination-container span {
+padding: 8px 12px;
+text-decoration: none;
+color: #333;
+border: 1px solid #ddd;
+border-radius: 4px;
+transition: background-color 0.3s;
+}
+.pagination-container a:hover {
+background-color: #f0f0f0;
+}
+.pagination-container .active {
+background-color: #5a5ce8;
+color: white;
+border-color: #5a5ce8;
+}
+.status-text.deleted { color: red; font-weight: bold; }
+</style>
+</head>
+<body>
+<c:import url="/WEB-INF/views/admin/adminNav.jsp" />
+
+<div class="admin-container">
+<h1 class="main-title">지식인 게시글 관리</h1>
+
+<!-- 검색 및 필터링 영역 -->
+<div class="search-area">
+  <form action="searchKnowledge" method="GET" onsubmit="return validateSearch(this);">
+    <select name="condition" class="search-select">
+      <option value="title">제목</option>
+      <option value="content">내용</option>
+      <option value="writer">작성자</option>
+      <option value="category">카테고리</option>
+    </select>
+    <input type="text" name="keyword" class="search-input" placeholder="검색어를 입력하세요">
+    <button type="submit" class="btn btn-search">검색</button>
+  </form>
+  <button class="btn btn-danger" onclick="deleteCheckedPosts(this.form)">선택 글 비활성화</button>
+</div>
+
+<!-- 게시글 목록 테이블 -->
+<form action="deleteCheckedKnowledge" method="POST" id="postManageForm">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th style="width: 5%;">
+          <input type="checkbox" id="selectAllCheckboxPost">
+        </th>
+        <th style="width: 10%;">번호</th>
+        <th>제목</th>
+        <th style="width: 15%;">작성자(ID)</th>
+        <th style="width: 10%;">카테고리</th>
+        <th style="width: 15%;">작성일</th>
+        <th style="width: 10%;">상태</th>
+        <th style="width: 10%;">상세</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%-- 💡 지식인 게시글 목록이 Model에 담겨있다고 가정 (knowledgeList) --%>
+      <tr>
+        <td colspan="8">조회된 지식인 게시글이 없습니다. (목록 구현 예정)</td>
+      </tr>
+    </tbody>
+  </table>
+</form>
+
+<!-- 페이징바 영역 (Placeholder) -->
+<div class="pagination-container">
+  <span>&laquo;</span>
+  <span class="active">1</span>
+  <a href="#">2</a>
+  <a href="#">3</a>
+  <span>&raquo;</span>
+</div>
+
+
+</div>
+
+<script>
+function validateSearch(form) {
+const keyword = form.keyword.value.trim();
+if (keyword === "") {
+alert("검색어를 입력해주세요.");
+return false;
+}
+return true;
+}
+function deleteCheckedPosts(form) {
+const selectedCheckboxes = document.querySelectorAll('.itemCheckboxPost:checked');
+if (selectedCheckboxes.length === 0) {
+alert("삭제할 게시글을 하나 이상 선택해주세요.");
+return;
+}
+if (confirm(선택된 게시글 ${selectedCheckboxes.length}개를 정말로 비활성화(삭제 처리)하시겠습니까?)) {
+form.action = "<c:url value="/admin/deleteCheckedKnowledge" />";
+form.method = "POST";
+const formElement = document.getElementById('postManageForm');
+formElement.querySelectorAll('input[name="postNoList"]').forEach(input => input.remove());
+
+        selectedCheckboxes.forEach(checkbox =&gt; {
+            const hiddenInput = document.createElement(&#39;input&#39;);
+            hiddenInput.type = &#39;hidden&#39;;
+            hiddenInput.name = &#39;postNoList&#39;;
+            hiddenInput.value = checkbox.value;
+            formElement.appendChild(hiddenInput);
+        });
+        formElement.submit(); 
+    }
+}
+document.addEventListener(&#39;DOMContentLoaded&#39;, (event) =&gt; {
+    const selectAllCheckbox = document.getElementById(&#39;selectAllCheckboxPost&#39;);
+    const itemCheckboxes = document.querySelectorAll(&#39;.itemCheckboxPost&#39;);
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener(&#39;change&#39;, function() {
+            itemCheckboxes.forEach(checkbox =&gt; {
+                checkbox.checked = this.checked;
+            });
+        });
+    }
+    itemCheckboxes.forEach(checkbox =&gt; {
+        checkbox.addEventListener(&#39;change&#39;, () =&gt; {
+            const checkedItems = document.querySelectorAll(&#39;.itemCheckboxPost:checked&#39;).length;
+            if (!checkbox.checked) {
+                if (selectAllCheckbox) selectAllCheckbox.checked = false;
+            } else if (checkedItems === itemCheckboxes.length) {
+                if (selectAllCheckbox) selectAllCheckbox.checked = true;
+            }
+        });
+    });
+});
+
+
+</script>
+
+</body>
+</html>

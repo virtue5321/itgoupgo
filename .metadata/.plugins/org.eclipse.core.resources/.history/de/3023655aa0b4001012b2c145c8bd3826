@@ -1,0 +1,38 @@
+package com.itgoupgo.community.admin.model.dao;
+
+import java.util.List;
+
+import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.stereotype.Repository;
+
+import com.itgoupgo.community.member.model.vo.Member;
+
+@Repository
+public class AdminDao {
+	
+	public List<Member> selectMemberList(SqlSessionTemplate sqlSession) {
+		
+		return sqlSession.selectList("adminMapper.selectMemberList");
+	}
+	
+	public int deleteMemberAdmin(SqlSessionTemplate sqlSession, String userId) {
+		
+		return sqlSession.update("adminMapper.deleteMemberAdmin", userId);
+	}
+    
+    // 💡 일괄 회원 탈퇴 (쿼리 호출) - 메소드명 통일
+    public int deleteCheckMember(SqlSessionTemplate sqlSession, List<Integer> memberNoList) {
+        
+        return sqlSession.update("adminMapper.deleteCheckMember", memberNoList);
+    }
+    
+    // 💡 1. 회원 이름으로 검색: List<Member> 반환 및 selectList 사용
+    public List<Member> searchMemberByName(SqlSessionTemplate sqlSession, String memberName) {
+        return sqlSession.selectList("adminMapper.searchMemberByName", memberName);
+    }
+
+    // 💡 2. 회원 아이디로 검색: Member 반환 및 selectOne 사용
+    public Member searchMemberById(SqlSessionTemplate sqlSession, String memberId) {
+        return sqlSession.selectOne("adminMapper.searchMemberById", memberId);
+    }
+}

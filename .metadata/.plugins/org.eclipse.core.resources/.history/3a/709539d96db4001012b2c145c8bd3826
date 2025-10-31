@@ -1,0 +1,32 @@
+package com.itgoupgo.community.admin.model.dao;
+
+import java.util.List;
+
+import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.stereotype.Repository;
+
+import com.itgoupgo.community.member.model.vo.Member;
+
+@Repository
+public class AdminDao {
+	
+	public List<Member> selectMemberList(SqlSessionTemplate sqlSession) {
+		
+		return sqlSession.selectList("adminMapper.selectMemberList");
+	}
+	
+	public int deleteMemberAdmin(SqlSessionTemplate sqlSession, String userId) {
+		
+		return sqlSession.update("adminMapper.deleteMemberAdmin", userId);
+	}
+	
+	public List<Member> searchMemberByName(SqlSessionTemplate sqlSession, String memberName) {
+		
+		return sqlSession.selectList("adminMapper.searchMemberName", memberName);
+	}
+	
+	public Member searchMemberById(SqlSessionTemplate sqlSession, String memberId) {
+		
+		return sqlSession.selectOne("adminMapper.searchMemberId", memberId);
+	}
+}

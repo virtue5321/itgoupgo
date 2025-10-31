@@ -1,0 +1,201 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
+<!DOCTYPE html>
+
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>관리자 - 공지사항 관리</title>
+<link rel="stylesheet" href="<c:url value="/resources/css/adminStyle.css" />">
+<style>
+/* 페이징바 스타일 */
+.pagination-container {
+display: flex;
+justify-content: center;
+padding: 20px 0;
+gap: 5px;
+}
+.pagination-container a, .pagination-container span {
+padding: 8px 12px;
+text-decoration: none;
+color: #333;
+border: 1px solid #ddd;
+border-radius: 4px;
+transition: background-color 0.3s;
+}
+.pagination-container a:hover {
+background-color: #f0f0f0;
+}
+.pagination-container .active {
+background-color: #5a5ce8;
+color: white;
+border-color: #5a5ce8;
+}
+.status-text.deleted { color: red; font-weight: bold; }
+</style>
+</head>
+<body>
+<c:import url="/WEB-INF/views/admin/adminNav.jsp" /> <%-- 관리자 네비게이션 포함 (경로 확인 필요) --%>
+
+<div class="admin-container">
+<h1 class="main-title">공지사항 게시글 관리</h1>
+
+<div class="search-area">
+  <form action="searchNotice" method="GET" onsubmit="return validateSearch(this);">
+    <select name="condition" class="search-select">
+      <option value="title">제목</option>
+      <option value="content">내용</option>
+      <option value="writer">작성자</option>
+    </select>
+    <input type="text" name="keyword" class="search-input" placeholder="검색어를 입력하세요">
+    <button type="submit" class="btn btn-search">검색</button>
+  </form>
+  <button class="btn btn-danger" onclick="deleteCheckedPosts(this.form)">선택 글 비활성화</button>
+</div>
+
+<form action="deleteCheckedNotice" method="POST" id="postManageForm">
+  <table 
+class="data-table">
+    <thead>
+      <tr>
+        <th style="width: 5%;">
+          <input type="checkbox" id="selectAllCheckboxPost">
+        </th>
+        <th style="width: 10%;">번호</th>
+        <th>제목</th>
+        <th style="width: 15%;">작성자(ID)</th>
+        <th style="width: 15%;">작성일</th>
+        <th style="width: 10%;">조회수</th>
+        <th style="width: 10%;">상태</th>
+  
+       <th style="width: 10%;">상세</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%-- 💡 공지사항 게시글 목록이 Model에 담겨있다고 가정 (noticeList) --%>
+      <c:choose>
+        <c:when test="${!empty noticeList}">
+          <c:forEach var="notice" items="${noticeList}">
+            <tr>
+              <td>
+         
+               <input type="checkbox" class="itemCheckboxPost" name="postNoList" value="${notice.noticeNo}">
+              </td>
+              <td>${notice.noticeNo}</td>
+              <td class="text-left">
+                <a href="noticeDetail?no=${notice.noticeNo}" class="title-link">
+                  ${notice.noticeTitle}
+          
+                </a>
+              </td>
+              <td>${notice.memberId}(${notice.memberNo})</td>
+              <td><fmt:formatDate value="${notice.noticeCreateDate}" pattern="yyyy.MM.dd" /></td>
+              <td>${notice.noticeView}</td>
+              <td>
+                <span class="status-text ${notice.noticeDeleteStatus eq 'Y' 
+? 'deleted' : 'active'}">
+                  ${notice.noticeDeleteStatus eq 'Y' ? '[비활성]' : '[활성]'}
+                </span>
+              </td>
+              <td>
+                <a href="noticeDetail?no=${notice.noticeNo}" class="btn btn-sm btn-info">상세</a>
+         
+             </td>
+            </tr>
+          </c:forEach>
+        </c:when>
+        <c:otherwise>
+          <tr>
+            <td colspan="8">조회된 공지사항 게시글이 없습니다.</td>
+          </tr>
+        </c:otherwise>
+      </c:choose>
+    </tbody>
+  </table>
+</form>
+
+<div class="pagination-container">
+  <%-- 💡 페이지네이션 구현 위치 --%>
+  <span>&laquo;</span>
+  <span class="active">1</span>
+  <a href="#">2</a>
+  <a href="#">3</a>
+  <span>&raquo;</span>
+</div>
+
+
+</div>
+
+<script>
+// 🔴 1. 검색 유효성 검사
+function validateSearch(form) {
+const keyword = form.keyword.value.trim();
+if (keyword === "") {
+alert("검색어를 입력해주세요.");
+return false;
+}
+return true;
+}
+
+// 🔴 2. 선택된 게시글 일괄 비활성화 (POST 요청)
+function deleteCheckedPosts(form) {
+    const selectedCheckboxes = document.querySelectorAll('.itemCheckboxPost:checked');
+ if (selectedCheckboxes.length === 0) {
+        alert("삭제할 게시글을 하나 이상 선택해주세요.");
+        return;
+ }
+
+    if (confirm(`선택된 게시글 ${selectedCheckboxes.length}개를 정말로 비활성화(삭제 처리)하시겠습니까?`)) {
+        // 폼 액션과 메소드 설정
+        form.action = "<c:url value="/admin/deleteCheckedNotice"/>";
+        form.method = "POST";
+        
+        // 전송을 위해 폼에 일괄 삭제용 히든 인풋 추가 (Controller에서 postNoList로 받을 것을 가정)
+        const formElement = document.getElementById('postManageForm');
+ // 기존 히든 인풋 제거
+        formElement.querySelectorAll('input[name="postNoList"]').forEach(input => input.remove());
+ selectedCheckboxes.forEach(checkbox => {
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'postNoList'; // Controller의 @RequestParam 이름과 일치
+            hiddenInput.value = checkbox.value;
+            formElement.appendChild(hiddenInput);
+        });
+ formElement.submit(); 
+    }
+}
+
+// 🔴 3. 체크박스 전체 선택/해제 기능
+document.addEventListener('DOMContentLoaded', (event) => {
+    const selectAllCheckbox = document.getElementById('selectAllCheckboxPost');
+    const itemCheckboxes = document.querySelectorAll('.itemCheckboxPost');
+
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function() {
+            itemCheckboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+        });
+    }
+    
+ 
+    itemCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+            const checkedItems = document.querySelectorAll('.itemCheckboxPost:checked').length;
+            if (!checkbox.checked) {
+                if (selectAllCheckbox) selectAllCheckbox.checked = false;
+            } else if (checkedItems === itemCheckboxes.length) {
+                
+ if (selectAllCheckbox) selectAllCheckbox.checked = true;
+            }
+        });
+ });
+});
+
+
+</script>
+
+</body>
+</html>

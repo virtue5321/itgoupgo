@@ -1,0 +1,116 @@
+package com.itgoupgo.community.admin.model.vo;
+
+import java.util.Date;
+
+// 관리자 페이지에서 5개 게시판의 글을 통합하여 조회하기 위한 VO
+public class PostVO {
+
+    private int postNo;        // 글 번호 (각 게시판의 *_NO)
+    private String postTitle;  // 글 제목 (각 게시판의 *_TITLE)
+    private String boardCode;  // 게시판 코드 (FREE, KNOWLEDGE, STUDY, INFO, NOTICE)
+    private String boardName;  // 게시판 이름 (자유게시판, 스터디게시판 등)
+    private String memberNick; // 작성자 닉네임 (MEMBER.MEMBER_NICK)
+    private Date createDate;   // 작성일 (각 게시판의 *_CREATE_DATE)
+    private int viewCount;     // 조회수 (각 게시판의 *_VIEW)
+    private String deleteStatus; // 삭제 여부 (각 게시판의 *_DELETE_STATUS)
+    
+    // Lombok을 사용하지 않는 경우, 기본 생성자, 매개변수 생성자, Getter/Setter, toString 구현 필요
+    
+    // --- Getter & Setter ---
+
+    public int getPostNo() {
+        return postNo;
+    }
+
+    public void setPostNo(int postNo) {
+        this.postNo = postNo;
+    }
+
+    public String getPostTitle() {
+        return postTitle;
+    }
+
+    public void setPostTitle(String postTitle) {
+        this.postTitle = postTitle;
+    }
+
+    public String getBoardCode() {
+        return boardCode;
+    }
+
+    // DB에서 BOARD_CODE를 설정할 때 사용
+    public void setBoardCode(String boardCode) {
+        this.boardCode = boardCode;
+        // 게시판 코드에 따라 게시판 이름 설정
+        switch (boardCode) {
+            case "FREE": 
+                this.boardName = "자유게시판";
+                break;
+            case "STUDY":
+                this.boardName = "스터디게시판";
+                break;
+            case "KNOWLEDGE":
+                this.boardName = "정보 나눔 게시판"; // KNOWLEDGE가 아니라 INFO_BBS가 정보나눔이지만, 기존 KNOWLEDGE 테이블을 정보나눔으로 사용한다면 이렇게 설정합니다.
+                break;
+            case "INFO": // IT 뉴스 게시판이 INFO_BBS 테이블이 아닌 INFO_BBS와 IT_BBS 두개로 분리되어 있으므로 이 부분은 맵퍼에서 명확히 해야 함
+                this.boardName = "정보 나눔 게시판";
+                break;
+            case "IT":
+                this.boardName = "IT 뉴스 게시판";
+                break;
+            case "NOTICE":
+                this.boardName = "공지사항";
+                break;
+            default:
+                this.boardName = "기타";
+                break;
+        }
+    }
+
+    public String getBoardName() {
+        return boardName;
+    }
+
+    public void setBoardName(String boardName) {
+        this.boardName = boardName;
+    }
+
+    public String getMemberNick() {
+        return memberNick;
+    }
+
+    public void setMemberNick(String memberNick) {
+        this.memberNick = memberNick;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+
+    public int getViewCount() {
+        return viewCount;
+    }
+
+    public void setViewCount(int viewCount) {
+        this.viewCount = viewCount;
+    }
+
+    public String getDeleteStatus() {
+        return deleteStatus;
+    }
+
+    public void setDeleteStatus(String deleteStatus) {
+        this.deleteStatus = deleteStatus;
+    }
+
+    @Override
+    public String toString() {
+        return "PostVO [postNo=" + postNo + ", postTitle=" + postTitle + ", boardCode=" + boardCode + ", boardName="
+                + boardName + ", memberNick=" + memberNick + ", createDate=" + createDate + ", viewCount=" + viewCount
+                + ", deleteStatus=" + deleteStatus + "]";
+    }
+}

@@ -1,0 +1,5 @@
+package com.itgoupgo.community.free.model.dao;
+
+public class FreeDao {
+
+}

@@ -1,0 +1,91 @@
+package com.itgoupgo.community.free.model.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.session.RowBounds;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.stereotype.Repository;
+
+import com.itgoupgo.community.free.model.vo.FreeBbs;
+
+/**
+ * 자유 게시판 Data Access Object (DAO)
+ * MyBatis를 사용하여 데이터베이스와 통신합니다.
+ */
+@Repository
+public class FreeDao {
+
+    /**
+     * 전체 게시글 개수 조회
+     * @param sqlSession MyBatis SqlSessionTemplate
+     * @return 전체 게시글 수
+     */
+    public int selectListCount(SqlSessionTemplate sqlSession) {
+        // "freeMapper" 네임스페이스의 "selectListCount" ID를 가진 쿼리를 실행
+        return sqlSession.selectOne("adminMapper.selectFreeListCount");
+    }
+
+    /**
+     * 현재 페이지에 해당하는 게시글 목록 조회 (페이징 적용)
+     * @param sqlSession MyBatis SqlSessionTemplate
+     * @param rowBounds 페이징 처리를 위한 RowBounds 객체 (offset, limit 정보 포함)
+     * @return 조회된 FreeBbs 목록
+     */
+    public List<FreeBbs> selectList(SqlSessionTemplate sqlSession, RowBounds rowBounds) {
+        // "freeMapper" 네임스페이스의 "selectList" ID를 가진 쿼리를 실행
+        // 두 번째 인자가 null이면 전체 목록, RowBounds가 있으면 페이징 처리
+        return sqlSession.selectList("adminMapper.selectFreeList", null, rowBounds);
+    }
+
+    /**
+     * 특정 게시글 번호(freeNo)로 게시글 조회
+     * @param sqlSession MyBatis SqlSessionTemplate
+     * @param freeNo 조회할 게시글 번호
+     * @return 조회된 FreeBbs 객체
+     */
+    public FreeBbs selectFreeBbs(SqlSessionTemplate sqlSession, int freeNo) {
+        return sqlSession.selectOne("freeMapper.selectFreeBbs", freeNo);
+    }
+
+    /**
+     * 게시글 조회수 1 증가
+     * @param sqlSession MyBatis SqlSessionTemplate
+     * @param freeNo 조회수 증가 대상 게시글 번호
+     * @return 처리된 행의 수 (1이면 성공)
+     */
+    public int increaseFreeBbsCount(SqlSessionTemplate sqlSession, int freeNo) {
+        return sqlSession.update("freeMapper.increaseFreeBbsCount", freeNo);
+    }
+
+    /**
+     * 새로운 게시글 등록
+     * @param sqlSession MyBatis SqlSessionTemplate
+     * @param f 등록할 FreeBbs 객체 (제목, 내용, 작성자 회원번호 등 포함)
+     * @return 처리된 행의 수 (1이면 성공)
+     */
+    public int insertFreeBbs(SqlSessionTemplate sqlSession, FreeBbs f) {
+        return sqlSession.insert("adminMapper.insertFreeBbs", f);
+    }
+
+    /**
+     * 게시글 삭제 (실제로는 삭제 상태를 'Y'로 업데이트)
+     * @param sqlSession MyBatis SqlSessionTemplate
+     * @param freeNo 삭제할 게시글 번호
+     * @return 처리된 행의 수 (1이면 성공)
+     */
+    public int deleteFreeBbs(SqlSessionTemplate sqlSession, int freeNo) {
+        // 상태값만 변경하는 UPDATE 쿼리를 호출하는 것이 일반적
+        return sqlSession.update("adminMapper.deleteFreeBbs", freeNo);
+    }
+    
+    /**
+     * 게시글 삭제 (실제로는 삭제 상태를 'Y'로 업데이트)
+     * @param sqlSession MyBatis SqlSessionTemplate
+     * @param freeNo 삭제할 게시글 번호
+     * @return 처리된 행의 수 (1이면 성공)
+     */
+    public int deleteFreeBbsCheck(SqlSessionTemplate sqlSession, List<Integer> bbsNoList) {
+        // 상태값만 변경하는 UPDATE 쿼리를 호출하는 것이 일반적
+        return sqlSession.update("adminMapper.deleteFreeBbsCheck", bbsNoList);
+    }
+}

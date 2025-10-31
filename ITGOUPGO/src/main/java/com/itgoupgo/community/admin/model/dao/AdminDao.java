@@ -1,0 +1,81 @@
+package com.itgoupgo.community.admin.model.dao;
+
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.session.RowBounds;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.stereotype.Repository;
+
+import com.itgoupgo.community.common.model.vo.Pagination;
+import com.itgoupgo.community.member.model.vo.Member;
+
+@Repository
+public class AdminDao {
+	
+	/**
+     * 1. 회원 전체 목록 수 조회
+     */
+    public int selectListCount(SqlSessionTemplate sqlSession) {
+        // selectOne은 int를 반환하도록 MyBatis 설정되어야 함
+        return sqlSession.selectOne("adminMapper.selectListCount");
+    }
+	
+	/**
+     * 2. 현재 페이지에 해당하는 회원 목록 조회
+     */
+	public List<Member> selectMemberList(SqlSessionTemplate sqlSession, Pagination pageInfo) {
+		
+        // RowBounds 객체를 이용하여 페이징 처리
+        int offset = (pageInfo.getCurrentPage() - 1) * pageInfo.getListLimit(); // 시작 행 계산
+        int limit = pageInfo.getListLimit(); // 한 페이지에 조회할 행 수
+
+        // org.apache.ibatis.session.RowBounds 객체 사용
+        RowBounds rowBounds = new RowBounds(offset, limit); 
+        
+        // 쿼리는 WHERE 조건 없이 전체 목록을 대상으로 함
+		return sqlSession.selectList("adminMapper.selectMemberList", null, rowBounds); 
+	}
+	
+    /**
+     * 2. 회원 단일 탈퇴
+     */
+	public int deleteMemberAdmin(SqlSessionTemplate sqlSession, String userId) {
+		
+		return sqlSession.update("adminMapper.deleteMemberAdmin", userId);
+	}
+    
+    /**
+     * 3. 일괄 회원 탈퇴
+     */
+    public int deleteCheckMember(SqlSessionTemplate sqlSession, List<Integer> memberNoList) {
+        
+        return sqlSession.update("adminMapper.deleteCheckMember", memberNoList);
+    }
+    
+    /**
+     * 4. 회원 이름으로 검색: List<Member> 반환
+     */
+    public List<Member> searchMemberByName(SqlSessionTemplate sqlSession, String memberName) {
+        return sqlSession.selectList("adminMapper.searchMemberByName", memberName);
+    }
+
+    /**
+     * 5. 회원 아이디로 검색: Member 반환
+     */
+    public Member searchMemberById(SqlSessionTemplate sqlSession, String memberId) {
+        return sqlSession.selectOne("adminMapper.searchMemberById", memberId);
+    }
+    
+    // ----------------------------------------------------
+    // 🟢 6. 회원 상세 조회 기능 추가
+    // ----------------------------------------------------
+    /**
+     * 회원 상세 조회: Member 단일 객체 반환 및 selectOne 사용
+     */
+    public Member selectMemberDetail(SqlSessionTemplate sqlSession, int memberNo) {
+        // MyBatis Mapper ID: adminMapper.selectMemberDetail
+        return sqlSession.selectOne("adminMapper.selectMemberDetail", memberNo);
+    }
+    
+}

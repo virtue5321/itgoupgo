@@ -1,0 +1,5 @@
+package com.itgoupgo.community.knowledge.model.dao;
+
+public class KnowledgeDao {
+
+}

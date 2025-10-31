@@ -1,0 +1,41 @@
+package com.itgoupgo.community.member.model.vo;
+
+import java.sql.Date;
+
+public class Member {
+	
+	// 필드부
+	private int memberNo; // MEMBER_NO	NUMBER
+	private String memberId; // MEMBER_ID	VARCHAR2(20 BYTE)
+	private String memberPwd; // MEMBER_PWD	VARCHAR2(100 BYTE)
+	private String memberName; // MEMBER_NAME	VARCHAR2(20 BYTE)
+	private String memberNick; // MEMBER_NICK	VARCHAR2(24 BYTE)
+	private Date memberBitrhDate; // MEMBER_BIRTH_DATE	DATE
+	private String gender; // GENDER	CHAR(1 BYTE)
+	private String email; // EMAIL	VARCHAR2(30 BYTE)
+	private String phone; // PHONE	VARCHAR2(13 BYTE)
+	private Date enrollDate; //ENROLL_DATE	DATE
+	private String memberStatus; // MEMBER_STATUS	CHAR(1 BYTE)
+	
+	// 생성자부
+	public Member() {}
+	
+	public Member(int memberNo, String memberId, String memberPwd, String memberName, String memberNick,
+			Date memberBitrhDate, String gender, String email, String phone, Date enrollDate, String memberStatus) {
+		super();
+		this.memberNo = memberNo;
+		this.memberId = memberId;
+		this.memberPwd = memberPwd;
+		this.memberName = memberName;
+		this.memberNick = memberNick;
+		this.memberBitrhDate = memberBitrhDate;
+		this.gender = gender;
+		this.email = email;
+		this.phone = phone;
+		this.enrollDate = enrollDate;
+		this.memberStatus = memberStatus;
+	}
+	
+	
+	
+}
